@@ -6,9 +6,12 @@
 "Size:" = "Размер:";
 "Settings" = "Настройки";
 "Big Folder" = "Большая папка";
+"4x5 - Full Screen" = "4x5 - Весь экран";
 "Radius:" = "Радиус:";
 "Style" = "Стиль";
-"iOS 9 - style" = "iOS 9 - стиль";
+"Default" = "Стандартный";
+"iOS 9 - Blur" = "iOS 9 - Блюр";
+"iOS 9 - No Blur" = "iOS 9 - Без блюра";
 "Color Settings" = "Настройки цвета";
 "Hide" = "Скрыть";
 "Hide Animation" = "Скрыть анимацию";

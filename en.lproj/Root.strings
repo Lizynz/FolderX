@@ -6,9 +6,12 @@
 "Size:" = "Size:";
 "Settings" = "Settings";
 "Big Folder" = "Big Folder";
+"4x5 - Full Screen" = "4x5 - Full Screen";
 "Radius:" = "Radius:";
 "Style" = "Style";
-"iOS 9 - style" = "iOS 9 - style";
+"Default" = "Default";
+"iOS 9 - Blur" = "iOS 9 - Blur";
+"iOS 9 - No Blur" = "iOS 9 - No Blur";
 "Color Settings" = "Color Settings";
 "Hide" = "Hide";
 "Hide Animation" = "Hide Animation";
