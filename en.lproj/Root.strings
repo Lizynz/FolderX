@@ -6,7 +6,6 @@
 "Size:" = "Size:";
 "Settings" = "Settings";
 "Big Folder" = "Big Folder";
-"4x5 - Full Screen" = "4x5 - Full Screen";
 "Radius:" = "Radius:";
 "Style" = "Style";
 "Default" = "Default";
@@ -16,10 +15,14 @@
 "Hide" = "Hide";
 "Hide Animation" = "Hide Animation";
 "Hide Background" = "Hide Background";
-"Hide Folder Label" = "Hide Folder Label";
+"Hide Title on HS" = "Hide Title on HS";
+"Hide Title in Folder" = "Hide Title in Folder";
+"Hide Label" = "Hide Label";
+"Hide Page Dots" = "Hide Page Dots";
 "Other" = "Other";
 "Auto Close Folder" = "Auto Close Folder";
 "Tap to Close Folder" = "Tap to Close Folder";
+"Launcher" = "Launcher";
 "Drag Multi Folders" = "Drag Multi Folders";
 "Drag Multi Widgets" = "Drag Multi Widgets";
 "Author" = "Author";

@@ -14,10 +14,14 @@
 "Hide" = "الإخفاء";
 "Hide Animation" = "إخفاء التأثير الحركي";
 "Hide Background" = "إخفاء الخلفية";
-"Hide Folder Label" = "إخفاء اسم المجلد";
+"Hide Title on HS" = "Hide Title on HS";
+"Hide Title in Folder" = "Hide Title in Folder";
+"Hide Label" = "إخفاء اسم المجلد";
+"Hide Page Dots" = "Hide Page Dots";
 "Other" = "أخرى";
 "Auto Close Folder" = "إغلاق المجلد تلقائيًا";
 "Tap to Close Folder" = "النقر لإغلاق المجلد";
+"Launcher" = "Launcher";
 "Drag Multi Folders" = "سحب مجلدات متعددة";
 "Drag Multi Widgets" = "سحب أدوات متعددة (ويدجات)";
 "Author" = "المالك";
