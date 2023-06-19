@@ -1,2 +1,2 @@
 # FolderX
-Tweak for folder iOS 15.x - 16.x (palera1n and Fugu15).
+Tweak for folder iOS/iPadOS 15.x - 16.x (palera1n and Dopamine).
