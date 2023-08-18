@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>items</key>
+		<array>
+	<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.lizynz.folderx</string>
+			<key>key</key>
+			<string>launcher</string>
+			<key>label</key>
+			<string>Launcher (swipe up)</string>
+	</dict>
+        <dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+        </dict>
+	<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.lizynz.folderx</string>
+			<key>key</key>
+			<string>countApp</string>
+			<key>label</key>
+			<string>Count Apps</string>
+	</dict>
+        <dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+	</dict>
+	<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.lizynz.folderx</string>
+			<key>key</key>
+			<string>alphabet</string>
+			<key>label</key>
+			<string>Sort alphabetically</string>
+	</dict>
+        <dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+	</dict>
+	<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.lizynz.folderx</string>
+			<key>key</key>
+			<string>HideLauncherLabel</string>
+			<key>label</key>
+			<string>Hide Label</string>
+	</dict>
+		</array>
+		<key>title</key>
+		<string>Launcher</string>
+	</dict>
+</plist>
