@@ -157,6 +157,10 @@
 			<string>PSGroupCell</string>
                         <key>label</key>
 			<string>Hide</string>
+			<key>footerAlignment</key>
+                        <integer>1</integer>
+			<key>footerText</key>
+			<string>Rename Folder (Swipe Two Finger Up) when Hide Title in Folder is enabled.</string>
 	</dict>
 	<dict>
 			<key>cell</key>

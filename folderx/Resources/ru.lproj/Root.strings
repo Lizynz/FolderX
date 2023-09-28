@@ -20,6 +20,7 @@
 "Hide Title" = "Скрыть название";
 "Hide Label" = "Скрыть подписи у иконок";
 "Hide Page Dots" = "Скрыть индикатор страниц";
+"Rename Folder (Swipe Two Finger Up) when Hide Title in Folder is enabled." = "Переименуйте папку (проведите двумя пальцами вверх), когда включена функция cкрыть название в папке.";
 "Other" = "Другое";
 "Auto Close Folder" = "Авто закрытие папки";
 "Tap to Close Folder" = "Закрыть папку по тапу";
@@ -27,5 +28,5 @@
 "Drag Multi Folders" = "Перенос нескольких папок";
 "Drag Multi Widgets" = "Перенос нескольких виджетов";
 "Author" = "Автор";
-"GitHub" = "GitHub";
-"Developer Twitter" = "Твиттер";
+"GitHub" = "Исходный код";
+"Developer Twitter" = "Социальная сеть";

@@ -34,13 +34,7 @@
 @end
 
 @interface SBFolderController : UIViewController
-@property (nonatomic, strong) SBFolder *folder;
-@property (nonatomic, strong) NSArray *icons;
-@property (nonatomic, strong) SBIconListView *customListView;
-@property (nonatomic,copy,readonly) NSArray *iconListViews;
-@property (nonatomic, strong) UILabel *countLabel;
 - (BOOL)isOpen;
-- (void)countApps;
 @end
 
 @interface SBIconController : UIViewController

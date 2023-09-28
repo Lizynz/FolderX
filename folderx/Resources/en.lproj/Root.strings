@@ -19,6 +19,7 @@
 "Hide Title in Folder" = "Hide Title in Folder";
 "Hide Label" = "Hide Label";
 "Hide Page Dots" = "Hide Page Dots";
+"Rename Folder (Swipe Two Finger Up) when Hide Title in Folder is enabled." = "Rename Folder (Swipe Two Finger Up) when Hide Title in Folder is enabled.";
 "Other" = "Other";
 "Auto Close Folder" = "Auto Close Folder";
 "Tap to Close Folder" = "Tap to Close Folder";
@@ -26,5 +27,5 @@
 "Drag Multi Folders" = "Drag Multi Folders";
 "Drag Multi Widgets" = "Drag Multi Widgets";
 "Author" = "Author";
-"GitHub" = "Github";
-"Developer Twitter" = "Twitter";
+"GitHub" = "Source code";
+"Developer Twitter" = "Social network";

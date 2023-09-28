@@ -4,7 +4,7 @@
 "Bold Title"="粗體標題";
 "Center"="中";
 "Color Settings"="顏色設定";
-"Developer Twitter"="推特";
+"Developer Twitter"="社交网络";
 "Drag Multi Folders"="允許移動多個資料夾";
 "Drag Multi Widgets"="允許移動多個小工具";
 "Launcher" = "Launcher";
@@ -17,6 +17,7 @@
 "Hide Label"="養藏資料夾內應用程式的名稱";
 "Hide Page Dots" = "隱藏頁面小點";
 "Left"="左";
+"Rename Folder (Swipe Two Finger Up) when Hide Title in Folder is enabled." = "Rename Folder (Swipe Two Finger Up) when Hide Title in Folder is enabled.";
 "Other"="進階";
 "Radius:"="資料夾邊角鈍度：";
 "Right"="右";

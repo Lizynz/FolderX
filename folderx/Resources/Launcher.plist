@@ -20,7 +20,23 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
         </dict>
-	<dict>
+        <dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.lizynz.folderx</string>
+			<key>key</key>
+			<string>FolderName</string>
+			<key>label</key>
+			<string>Folder Name</string>
+			<key>PostNotification</key>
+			<string>com.lizynz.folderx</string>
+			<key>id</key>
+			<string>SWITCH_ID</string>
+        </dict>
+        <dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
@@ -31,11 +47,9 @@
 			<string>countApp</string>
 			<key>label</key>
 			<string>Count Apps</string>
-	</dict>
-        <dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-	</dict>
+			<key>dynamicRule</key>
+			<string>SWITCH_ID, ==, 0</string>
+        </dict>
 	<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
@@ -47,10 +61,6 @@
 			<string>alphabet</string>
 			<key>label</key>
 			<string>Sort alphabetically</string>
-	</dict>
-        <dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
 	</dict>
 	<dict>
 			<key>cell</key>

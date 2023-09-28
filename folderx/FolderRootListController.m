@@ -6,15 +6,26 @@
 #import "ColourOptionsIconController.h"
 #import "ColourOptionsComentController.h"
 
+static NSBundle *tweakBundle = nil;
+#define LOCALIZED(str) [tweakBundle localizedStringForKey:str value:@"" table:nil]
+
 @implementation FolderRootListController{
     BOOL _settingsChanged;
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        tweakBundle = [NSBundle bundleWithPath:@"/var/jb/Library/PreferenceBundles/FolderX.bundle"];
+    }
+    return self;
 }
 
 - (NSArray *)specifiers {
     if (!_specifiers) {
         _specifiers = [[self loadSpecifiersFromPlistName:@"Root" target:self] retain];
         
-        UIAction *titleA = [UIAction actionWithTitle:@"Respring" image:[UIImage systemImageNamed:@"rays"] identifier:nil handler:^(__kindof UIAction *_Nonnull action) {
+        UIAction *titleA = [UIAction actionWithTitle:LOCALIZED(@"Respring") image:[UIImage systemImageNamed:@"rays"] identifier:nil handler:^(__kindof UIAction *_Nonnull action) {
             UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
             [spinner setCenter:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height / 2)];
             spinner.color = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
@@ -30,7 +41,7 @@
             });
         }];
 
-        UIAction *cancelA = [UIAction actionWithTitle:@"Reset settings" image:[UIImage systemImageNamed:@"trash"] identifier:nil handler:^(__kindof UIAction *_Nonnull action) {
+        UIAction *cancelA = [UIAction actionWithTitle:LOCALIZED(@"Reset settings") image:[UIImage systemImageNamed:@"trash"] identifier:nil handler:^(__kindof UIAction *_Nonnull action) {
             NSString *path1 = @"/var/jb/var/mobile/Library/Preferences/com.lizynz.folderx.plist";
             NSString *path2 = @"/var/mobile/Library/Preferences/com.lizynz.folderx.plist";
 
@@ -314,16 +325,154 @@
 
 @end
 
+typedef NS_ENUM(NSInteger, XXDynamicSpecifierOperatorType) {
+  XXEqualToOperatorType,
+  XXNotEqualToOperatorType,
+  XXGreaterThanOperatorType,
+  XXLessThanOperatorType,
+};
+
 @interface LauncherListController : PSListController
+@property (nonatomic, assign) BOOL hasDynamicSpecifiers;
+@property (nonatomic, retain) NSMutableDictionary *dynamicSpecifiers;
+- (void)collectDynamicSpecifiersFromArray:(NSArray *)array;
+- (BOOL)shouldHideSpecifier:(PSSpecifier *)specifier;
+- (XXDynamicSpecifierOperatorType)operatorTypeForString:(NSString *)string;
 @end
 
 @implementation LauncherListController
 - (NSArray *)specifiers {
     if (!_specifiers) {
         _specifiers = [[self loadSpecifiersFromPlistName:@"Launcher" target:self] retain];
+        
+        [self collectDynamicSpecifiersFromArray:_specifiers];
     }
     
     return _specifiers;
 }
 
+- (void)reloadSpecifiers {
+    [super reloadSpecifiers];
+    [self collectDynamicSpecifiersFromArray:self.specifiers];
+}
+
+- (void)collectDynamicSpecifiersFromArray:(NSArray *)array {
+    if (!self.dynamicSpecifiers) {
+        self.dynamicSpecifiers = [NSMutableDictionary new];
+    } else {
+        [self.dynamicSpecifiers removeAllObjects];
+    }
+    
+    for (PSSpecifier *specifier in array) {
+        NSString *dynamicSpecifierRule = [specifier propertyForKey:@"dynamicRule"];
+        
+        if (dynamicSpecifierRule.length > 0) {
+            NSArray *ruleComponents = [dynamicSpecifierRule componentsSeparatedByString:@", "];
+            if (ruleComponents.count == 3) {
+                NSString *opposingSpecifierID = [ruleComponents objectAtIndex:0];
+                if ([self.dynamicSpecifiers objectForKey:opposingSpecifierID]) {
+                    NSMutableArray *specifiers = [[self.dynamicSpecifiers objectForKey:opposingSpecifierID] mutableCopy];
+                    [specifiers addObject:specifier];
+                    [self.dynamicSpecifiers removeObjectForKey:opposingSpecifierID];
+                    [self.dynamicSpecifiers setObject:specifiers forKey:opposingSpecifierID];
+                } else {
+                    [self.dynamicSpecifiers setObject:[NSMutableArray arrayWithArray:@[specifier]] forKey:opposingSpecifierID];
+                }
+            } else {
+                [NSException raise:NSInternalInconsistencyException format:@"dynamicRule key requires three components (Specifier ID, Comparator, Value To Compare To). You have %ld of 3 (%@) for specifier '%@'.", ruleComponents.count, dynamicSpecifierRule, [specifier propertyForKey:PSTitleKey]];
+            }
+        }
+    }
+    
+    self.hasDynamicSpecifiers = (self.dynamicSpecifiers.count > 0);
+}
+
+#pragma mark - Observing Opposing Specifier Value Changes
+
+- (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier {
+    [super setPreferenceValue:value specifier:specifier];
+    
+    if (self.hasDynamicSpecifiers) {
+        NSString *specifierID = [specifier propertyForKey:PSIDKey];
+        PSSpecifier *dynamicSpecifier = [self.dynamicSpecifiers objectForKey:specifierID];
+        
+        if (dynamicSpecifier) {
+            [self.table beginUpdates];
+            [self.table endUpdates];
+        }
+    }
+}
+
+#pragma mark - Override Height
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.hasDynamicSpecifiers) {
+        PSSpecifier *dynamicSpecifier = [self specifierAtIndexPath:indexPath];
+        BOOL __block shouldHide = false;
+        
+        [self.dynamicSpecifiers enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            NSMutableArray *specifiers = obj;
+            if ([specifiers containsObject:dynamicSpecifier]) {
+                shouldHide = [self shouldHideSpecifier:dynamicSpecifier];
+                
+                UITableViewCell *specifierCell = [dynamicSpecifier propertyForKey:PSTableCellKey];
+                specifierCell.clipsToBounds = shouldHide;
+            }
+        }];
+        
+        if (shouldHide) {
+            return 0;
+        }
+    }
+    
+    return UITableViewAutomaticDimension;
+}
+
+- (BOOL)shouldHideSpecifier:(PSSpecifier *)specifier {
+    if (specifier) {
+        NSString *dynamicSpecifierRule = [specifier propertyForKey:@"dynamicRule"];
+        NSArray *ruleComponents = [dynamicSpecifierRule componentsSeparatedByString:@", "];
+        
+        PSSpecifier *opposingSpecifier = [self specifierForID:[ruleComponents objectAtIndex:0]];
+        id opposingValue = [self readPreferenceValue:opposingSpecifier];
+        id requiredValue = [ruleComponents objectAtIndex:2];
+        
+        if ([opposingValue isKindOfClass:NSNumber.class]) {
+            XXDynamicSpecifierOperatorType operatorType = [self operatorTypeForString:[ruleComponents objectAtIndex:1]];
+            
+            switch(operatorType) {
+                case XXEqualToOperatorType:
+                    return ([opposingValue intValue] == [requiredValue intValue]);
+                    break;
+                    
+                case XXNotEqualToOperatorType:
+                    return ([opposingValue intValue] != [requiredValue intValue]);
+                    break;
+                    
+                case XXGreaterThanOperatorType:
+                    return ([opposingValue intValue] > [requiredValue intValue]);
+                    break;
+                    
+                case XXLessThanOperatorType:
+                    return ([opposingValue intValue] < [requiredValue intValue]);
+                    break;
+            }
+        }
+        
+        if ([opposingValue isKindOfClass:NSString.class]) {
+            return [opposingValue isEqualToString:requiredValue];
+        }
+        
+        if ([opposingValue isKindOfClass:NSArray.class]) {
+            return [opposingValue containsObject:requiredValue];
+        }
+    }
+    
+    return NO;
+}
+
+- (XXDynamicSpecifierOperatorType)operatorTypeForString:(NSString *)string {
+    NSDictionary *operatorValues = @{ @"==" : @(XXEqualToOperatorType), @"!=" : @(XXNotEqualToOperatorType), @">" : @(XXGreaterThanOperatorType), @"<" : @(XXLessThanOperatorType) };
+    return [operatorValues[string] intValue];
+}
 @end
