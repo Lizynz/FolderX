@@ -1,7 +1,7 @@
-"Apps: %lu"="此資料夾內有%lu個應用程式";
-"reset color"="恢復預設顏色";
-"Respring" = "Respring";
-"Reset settings" = "重置设置";
-"Rename folder:" = "Rename folder:";
-"Cancel" = "Cancel";
-"Apply" = "Apply";
+"Apps: %lu"="此資料夾內有 %lu 個應用程式";
+"reset color"="回復預設顏色";
+"Respring" = "重新啟動主畫面";
+"Reset settings" = "回復預設設定";
+"Rename folder:" = "重新命名資料夾：";
+"Cancel" = "取消";
+"Apply" = "套用";
