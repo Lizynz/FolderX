@@ -69,3 +69,7 @@
 @interface _UIBackdropView : UIView
 - (id)initWithStyle:(int)arg1;
 @end
+
+@interface SBHLibraryAdditionalItemsIndicatorIconImageView : SBFolderIconImageView
+- (unsigned long long)concreteBackgroundStyle;
+@end

@@ -172,6 +172,21 @@ int FolderColor = 1;
 }
 
 %end
+
+%hook SBHLibraryAdditionalItemsIndicatorIconImageView
+- (void)layoutSubviews {
+    %orig;
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if (prefs) {
+        IconColor = [prefs objectForKey:@"IC"] ? [[prefs objectForKey:@"IC"] intValue] : IconColor;
+    }
+    
+    if (IconColor == 2) {
+        [self.backgroundView setBackgroundColor:[UIColor clearColor]];
+    }
+}
+
+%end
 %end
 
 //Background Color

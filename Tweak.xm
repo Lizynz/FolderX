@@ -176,10 +176,7 @@ int OLD = 1;
     if (OLD == 2) {
         return YES;
     }
-    
-    if (OLD == 3) {
-        return YES;
-    }
+
     return %orig;
 }
 
@@ -197,9 +194,6 @@ int OLD = 1;
         return ;
     }
     
-    if (OLD == 3) {
-        return ;
-    }
     return %orig;
 }
 
@@ -220,9 +214,6 @@ int OLD = 1;
         return %orig;
     }
     
-    if (OLD == 3) {
-        return ;
-    }
     return %orig;
 }
 
@@ -347,6 +338,34 @@ int TITLE = 2;
 
     if ([[prefs objectForKey:@"BoldTitle"] boolValue]) {
         [self setFont:[UIFont boldSystemFontOfSize:(self.font.pointSize)]];
+    }
+}
+
+%end
+
+%hook SBHLibraryAdditionalItemsIndicatorIconImageView
+- (void)layoutSubviews {
+    %orig;
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    
+    if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
+        
+        for (UIView *subview in self.subviews) {
+            if ([subview isKindOfClass:[UIVisualEffectView class]]) {
+                [subview removeFromSuperview];
+            }
+        }
+        
+        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleRegular];
+        UIVisualEffectView *blurEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+        
+        blurEffectView.frame = self.bounds;
+        blurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        blurEffectView.layer.cornerRadius = 13.5;
+        blurEffectView.layer.masksToBounds = YES;
+        blurEffectView.alpha = 0.4;
+        
+        [self insertSubview:blurEffectView atIndex:0];
     }
 }
 
