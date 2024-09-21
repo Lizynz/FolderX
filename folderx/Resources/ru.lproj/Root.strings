@@ -15,9 +15,8 @@
 "Hide" = "Скрыть";
 "Hide Animation" = "Скрыть анимацию";
 "Hide Background" = "Скрыть фон папки";
-"Hide Title on HS" = "Скрыть название на HS";
-"Hide Title in Folder" = "Скрыть название в папке";
-"Hide Title" = "Скрыть название";
+"Hide Title on HS" = "Скрыть имя папки";
+"Hide Title in Folder" = "Скрыть имя в папке";
 "Hide Label" = "Скрыть подписи у иконок";
 "Hide Page Dots" = "Скрыть индикатор страниц";
 "Rename Folder (Swipe Two Finger Up) when Hide Title in Folder is enabled." = "Переименуйте папку (проведите двумя пальцами вверх), когда включена функция cкрыть название в папке.";

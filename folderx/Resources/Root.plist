@@ -89,6 +89,28 @@
 			<string>Big Folder - iPhone</string>
 	</dict>
 	<dict>
+			<key>PostNotification</key>
+			<string>com.lizynz.folderx</string>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>min</key>
+			<string>500</string>
+			<key>max</key>
+			<string>550</string>
+			<key>default</key>
+			<string>525</string>
+			<key>defaults</key>
+			<string>com.lizynz.folderx</string>
+			<key>key</key>
+			<string>FolderSize</string>
+			<key>showValue</key>
+			<true/>
+			<key>isSegmented</key>
+			<true/>
+			<key>segmentCount</key>
+			<integer>2</integer>
+	</dict>
+	<dict>
 			<key>cellClass</key>
 			<string>RadiusStepperCell</string>
 			<key>default</key>

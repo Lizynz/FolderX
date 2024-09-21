@@ -29,12 +29,60 @@
             </array>
         </dict>
         <dict>
-			<key>cell</key>
-			<string>PSLinkCell</string>
+			<key>cellClass</key>
+			<string>FTColorCell</string>
+			<key>defaults</key>
+			<string>com.lizynz.folderx</string>
+			<key>key</key>
+			<string>nameColor</string>
 			<key>label</key>
 			<string>Folder Name</string>
-			<key>action</key>
-			<string>colorTitle</string>
+			<key>id</key>
+			<string>nameColor</string>
+			<key>PostNotification</key>
+			<string>com.lizynz.folderx</string>
+        </dict>
+	<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+	</dict>
+        <dict>
+			<key>cell</key>
+			<string>PSSegmentCell</string>
+			<key>default</key>
+			<integer>1</integer>
+			<key>defaults</key>
+			<string>com.lizynz.folderx</string>
+			<key>PostNotification</key>
+			<string>com.lizynz.folderx</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>key</key>
+			<string>TC</string>
+			<key>validTitles</key>
+                 <array>
+			<string>Default</string>
+			<string>Color</string>
+                 </array>
+			<key>validValues</key>
+                 <array>
+			<integer>1</integer>
+			<integer>2</integer>
+                 </array>
+        </dict>
+        <dict>
+			<key>cellClass</key>
+			<string>FTColorCell</string>
+			<key>defaults</key>
+			<string>com.lizynz.folderx</string>
+			<key>key</key>
+			<string>textColor</string>
+			<key>label</key>
+			<string>Folder Label</string>
+			<key>id</key>
+			<string>textColor</string>
+			<key>PostNotification</key>
+			<string>com.lizynz.folderx</string>
         </dict>
 	<dict>
 			<key>cell</key>
@@ -65,12 +113,18 @@
                  </array>
         </dict>
         <dict>
-			<key>cell</key>
-			<string>PSLinkCell</string>
+			<key>cellClass</key>
+			<string>FTColorCell</string>
+			<key>defaults</key>
+			<string>com.lizynz.folderx</string>
+			<key>key</key>
+			<string>ficonColor</string>
 			<key>label</key>
 			<string>Folder Icon</string>
-			<key>action</key>
-			<string>colorIcon</string>
+			<key>id</key>
+			<string>ficonColor</string>
+			<key>PostNotification</key>
+			<string>com.lizynz.folderx</string>
         </dict>
 	<dict>
 			<key>cell</key>
@@ -103,12 +157,18 @@
                  </array>
         </dict>
         <dict>
-			<key>cell</key>
-			<string>PSLinkCell</string>
+			<key>cellClass</key>
+			<string>FTColorCell</string>
+			<key>defaults</key>
+			<string>com.lizynz.folderx</string>
+			<key>key</key>
+			<string>fbackgroundColor</string>
 			<key>label</key>
 			<string>Folder Background</string>
-			<key>action</key>
-			<string>colorBackground</string>
+			<key>id</key>
+			<string>fbackgroundColor</string>
+			<key>PostNotification</key>
+			<string>com.lizynz.folderx</string>
         </dict>
 		</array>
 		<key>title</key>
