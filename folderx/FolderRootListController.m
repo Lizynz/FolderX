@@ -2,9 +2,7 @@
 #import "FolderRootListController.h"
 #import <spawn.h>
 
-#import "ColourOptionsController.h"
-#import "ColourOptionsIconController.h"
-#import "ColourOptionsComentController.h"
+static NSString *saveSettings = @"/var/jb/var/mobile/Library/Preferences/com.lizynz.folderx.plist";
 
 static NSBundle *tweakBundle = nil;
 #define LOCALIZED(str) [tweakBundle localizedStringForKey:str value:@"" table:nil]
@@ -23,7 +21,7 @@ static NSBundle *tweakBundle = nil;
 
 - (NSArray *)specifiers {
     if (!_specifiers) {
-        _specifiers = [[self loadSpecifiersFromPlistName:@"Root" target:self] retain];
+        _specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
         
         UIAction *titleA = [UIAction actionWithTitle:LOCALIZED(@"Respring") image:[UIImage systemImageNamed:@"rays"] identifier:nil handler:^(__kindof UIAction *_Nonnull action) {
             UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
@@ -75,10 +73,6 @@ static NSBundle *tweakBundle = nil;
         self.navigationItem.rightBarButtonItems = @[optionsItem];
     }
     return _specifiers;
-}
-
-- (void)dealloc {
-    [super dealloc];
 }
 
 - (void)twitter {
@@ -230,97 +224,48 @@ static NSBundle *tweakBundle = nil;
 @implementation ColorListController
 - (NSArray *)specifiers {
     if (!_specifiers) {
-        _specifiers = [[self loadSpecifiersFromPlistName:@"Color" target:self] retain];
+        _specifiers = [self loadSpecifiersFromPlistName:@"Color" target:self];
         
-        UIBarButtonItem *respringBtn = [[UIBarButtonItem alloc] initWithTitle:@"Respring" style:UIBarButtonItemStylePlain target:self action:@selector(respring)];
-        [[self navigationItem] setRightBarButtonItem:respringBtn animated:YES];
-        [respringBtn release];
-    }
+        UIAction *titleA = [UIAction actionWithTitle:LOCALIZED(@"Respring") image:[UIImage systemImageNamed:@"rays"] identifier:nil handler:^(__kindof UIAction *_Nonnull action) {
+            
+            pid_t pid;
+            int status;
+            const char* args[] = { "killall", "-9", "SpringBoard", NULL };
+            posix_spawn(&pid, "/var/jb/usr/bin/killall", NULL, NULL, (char* const*)args, NULL);
+            waitpid(pid, &status, WEXITED);
+            
+        }];
 
+        UIAction *cancelA = [UIAction actionWithTitle:LOCALIZED(@"Reset color") image:[UIImage systemImageNamed:@"trash"] identifier:nil handler:^(__kindof UIAction *_Nonnull action) {
+            
+            NSString *domain = saveSettings;
+            NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:domain];
+            
+            [defaults removeObjectForKey:@"nameColorDict"];
+            [defaults removeObjectForKey:@"textColorDict"];
+            [defaults removeObjectForKey:@"ficonColorDict"];
+            [defaults removeObjectForKey:@"fbackgroundColorDict"];
+            
+            [defaults synchronize];
+
+            [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:domain];
+            
+            double delayInSeconds = 0.5;
+                dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+            dispatch_after(delayTime, dispatch_get_main_queue(), ^{
+                exit(0);
+            });
+        }];
+        
+        cancelA.attributes = UIMenuElementAttributesDestructive;
+
+        UIMenu *menuActions = [UIMenu menuWithTitle:@"" children:@[titleA, cancelA]];
+        UIBarButtonItem *optionsItem = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"hand.tap"] menu:menuActions];
+        optionsItem.tintColor = [UIColor systemBlueColor];
+
+        self.navigationItem.rightBarButtonItems = @[optionsItem];
+    }
     return _specifiers;
-}
-
-- (void)respring {
-    pid_t pid;
-    int status;
-    const char* args[] = { "killall", "-9", "SpringBoard", NULL };
-    posix_spawn(&pid, "/var/jb/usr/bin/killall", NULL, NULL, (char* const*)args, NULL);
-    waitpid(pid, &status, WEXITED);
-}
-
-- (void)colorTitle {
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
-        ColourOptionsComentController *colourOptionsComentController = [[ColourOptionsComentController alloc] init];
-        UINavigationController *colourOptionsComentControllerView = [[UINavigationController alloc] initWithRootViewController:colourOptionsComentController];
-        colourOptionsComentControllerView.modalPresentationStyle = UIModalPresentationFullScreen;
-        colourOptionsComentControllerView.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-        [self presentViewController:colourOptionsComentControllerView animated:YES completion:nil];
-    }
-    
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad){
-        ColourOptionsComentController *colourOptionsComentController = [[ColourOptionsComentController alloc] init];
-        UINavigationController *colourOptionsComentControllerView = [[UINavigationController alloc] initWithRootViewController:colourOptionsComentController];
-        colourOptionsComentControllerView.modalPresentationStyle = UIModalPresentationPopover;
-
-        UIPopoverPresentationController *popoverPresentationController = [colourOptionsComentControllerView popoverPresentationController];
-        popoverPresentationController.delegate = self;
-        popoverPresentationController.sourceView = self.view;
-        popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds),0,0);
-        [self presentViewController:colourOptionsComentControllerView animated:YES completion:nil];
-    }
-}
-
-- (void)colorIcon {
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
-        ColourOptionsIconController *colourOptionsIconController = [[ColourOptionsIconController alloc] init];
-        UINavigationController *colourOptionsIconControllerView = [[UINavigationController alloc] initWithRootViewController:colourOptionsIconController];
-        colourOptionsIconControllerView.modalPresentationStyle = UIModalPresentationFullScreen;
-        colourOptionsIconControllerView.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-        [self presentViewController:colourOptionsIconControllerView animated:YES completion:nil];
-    }
-    
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad){
-        ColourOptionsIconController *colourOptionsIconController = [[ColourOptionsIconController alloc] init];
-        UINavigationController *colourOptionsIconControllerView = [[UINavigationController alloc] initWithRootViewController:colourOptionsIconController];
-        colourOptionsIconControllerView.modalPresentationStyle = UIModalPresentationPopover;
-
-        UIPopoverPresentationController *popoverPresentationController = [colourOptionsIconControllerView popoverPresentationController];
-        popoverPresentationController.delegate = self;
-        popoverPresentationController.sourceView = self.view;
-        popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds),0,0);
-        [self presentViewController:colourOptionsIconControllerView animated:YES completion:nil];
-    }
-}
-
-- (void)colorBackground {
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
-        ColourOptionsController *colourOptionsController = [[ColourOptionsController alloc] init];
-        UINavigationController *colourOptionsControllerView = [[UINavigationController alloc] initWithRootViewController:colourOptionsController];
-        colourOptionsControllerView.modalPresentationStyle = UIModalPresentationFullScreen;
-        colourOptionsControllerView.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-        [self presentViewController:colourOptionsControllerView animated:YES completion:nil];
-    }
-    
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad){
-        ColourOptionsController *colourOptionsController = [[ColourOptionsController alloc] init];
-        UINavigationController *colourOptionsControllerView = [[UINavigationController alloc] initWithRootViewController:colourOptionsController];
-        colourOptionsControllerView.modalPresentationStyle = UIModalPresentationPopover;
-
-        UIPopoverPresentationController *popoverPresentationController = [colourOptionsControllerView popoverPresentationController];
-        popoverPresentationController.delegate = self;
-        popoverPresentationController.sourceView = self.view;
-        popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds),0,0);
-        [self presentViewController:colourOptionsControllerView animated:YES completion:nil];
-    }
-}
-
-- (UIModalPresentationStyle)adaptivePresentationStyleForPresentationController:(UIPresentationController *)controller {
-    return UIModalPresentationNone;
-}
-
-- (UIViewController *)presentationController:(UIPresentationController *)controller viewControllerForAdaptivePresentationStyle:(UIModalPresentationStyle)style {
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller.presentedViewController];
-    return navController;
 }
 
 @end
@@ -343,7 +288,7 @@ typedef NS_ENUM(NSInteger, XXDynamicSpecifierOperatorType) {
 @implementation LauncherListController
 - (NSArray *)specifiers {
     if (!_specifiers) {
-        _specifiers = [[self loadSpecifiersFromPlistName:@"Launcher" target:self] retain];
+        _specifiers = [self loadSpecifiersFromPlistName:@"Launcher" target:self];
         
         [self collectDynamicSpecifiersFromArray:_specifiers];
     }

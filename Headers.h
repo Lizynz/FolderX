@@ -6,6 +6,11 @@
 
 #define kRWSettingsPath @"/var/jb/var/mobile/Library/Preferences/com.lizynz.folderx.plist"
 
+@interface NSUserDefaults (FolderX)
+- (id)objectForKey:(NSString *)key inDomain:(NSString *)domain;
+- (void)setObject:(id)value forKey:(NSString *)key inDomain:(NSString *)domain;
+@end
+
 @interface SBFolderBackgroundView : UIView <UIColorPickerViewControllerDelegate>
 + (double)cornerRadiusToInsetContent;
 + (CGSize)folderBackgroundSize;
@@ -13,6 +18,7 @@
 
 @interface SBFloatyFolderView : UIView <UIColorPickerViewControllerDelegate>
 - (void)_handleOutsideTap:(id)arg1;
+- (CGFloat)folderSize;
 @end
 
 @interface SBFolderIconImageView : UIView <UIColorPickerViewControllerDelegate>
@@ -49,9 +55,10 @@
 
 @class SBIconListView;
 
-@interface SBIconView : UIView
+@interface SBIconView : UIView <UIColorPickerViewControllerDelegate>
 @property (nonatomic, strong) SBIconListView *_atriaLastIconListView;
 @property (nonatomic, strong) NSString *location;
+- (id)_legibilitySettingsWithPrimaryColor:(UIColor *)color;
 @end
 
 @interface SBDockIconListView : SBIconListView
@@ -71,5 +78,6 @@
 @end
 
 @interface SBHLibraryAdditionalItemsIndicatorIconImageView : SBFolderIconImageView
+@property (nonatomic, assign) CGAffineTransform transform;
 - (unsigned long long)concreteBackgroundStyle;
 @end

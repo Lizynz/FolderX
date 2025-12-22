@@ -1,20 +1,33 @@
 #import <sys/utsname.h>
 #import "Headers.h"
 
-#define kScreenHeight         [[UIScreen mainScreen] bounds].size.height - 170
 #define kScreenWidth          [[UIScreen mainScreen] bounds].size.width - 20
 
 int OLD = 1;
+static CGFloat folderSize;
 
 %hook SBFloatyFolderView
 - (CGRect)_frameForScalingView {
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
     if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
-            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
-                return (CGRect){{10, 150},{kScreenWidth, kScreenHeight}};
-            }
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
+            CGRect frame = %orig;
+            
+            return (CGRect){{10, frame.origin.y},{kScreenWidth, [self folderSize]}};
+        }
     }
     return %orig;
+}
+
+%new
+- (CGFloat)folderSize {
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    id FolderSize = [prefs objectForKey:@"FolderSize"];
+    if ([FolderSize intValue] >= 500 && [FolderSize intValue] <= 550) {
+        folderSize = [FolderSize floatValue];
+        return folderSize;
+    }
+    return 525;
 }
 
 - (BOOL)_shouldConvertToMultipleIconListsInLandscapeOrientation {
@@ -115,7 +128,10 @@ int OLD = 1;
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
     if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
-            CGAffineTransform originalIconView = (self.transform);
+            
+            self.translatesAutoresizingMaskIntoConstraints = YES;
+            self.transform = CGAffineTransformIdentity;
+            CGAffineTransform originalIconView = CGAffineTransformIdentity;
             self.transform = CGAffineTransformMake(
                                                    0.7,
                                                    originalIconView.b,
@@ -130,6 +146,31 @@ int OLD = 1;
 }
 %end
 
+#define HideFolderLabel(x) [x.location isEqualToString:@"SBIconLocationFolder"] //hide folder label
+
+%hook SBIconView
+%property (nonatomic, strong) SBIconListView *_atriaLastIconListView;
+- (void)setAllowsLabelArea:(BOOL)allows {
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if ([[prefs objectForKey:@"HideFolderLabel"] boolValue]) {
+        if(HideFolderLabel(self)) {
+            allows = NO;
+        }
+    }
+    %orig(allows);
+}
+
+- (BOOL)allowsLabelArea {
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if ([[prefs objectForKey:@"HideFolderLabel"] boolValue]) {
+        if(HideFolderLabel(self)){
+            return NO;
+        }
+    }
+    return %orig;
+}
+%end
+
 %hook SBHFloatyFolderVisualConfiguration
 - (CGFloat)continuousCornerRadius { //folder radius #2
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
@@ -137,12 +178,12 @@ int OLD = 1;
     if( [FolderRadius intValue] >= 5 && [FolderRadius intValue] <= 30 ) {
         return [FolderRadius floatValue];
     }
-    return %orig;
+    return 30;
 }
 %end
 
 %hook SBFolderBackgroundView
-- (void)layoutSubviews { //hide background
+- (void)layoutSubviews { // Hide Background
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
     if ([[prefs objectForKey:@"bfh"] boolValue]) {
         self.alpha = 0;
@@ -158,7 +199,7 @@ int OLD = 1;
     if( [FolderRadius intValue] >= 5 && [FolderRadius intValue] <= 30 ) {
         return [FolderRadius floatValue];
     }
-    return %orig;
+    return 30;
 }
 %end
 
@@ -176,7 +217,7 @@ int OLD = 1;
     if (OLD == 2) {
         return YES;
     }
-
+    
     return %orig;
 }
 
@@ -193,7 +234,7 @@ int OLD = 1;
     if (OLD == 2) {
         return ;
     }
-    
+
     return %orig;
 }
 
@@ -346,27 +387,29 @@ int TITLE = 2;
 %hook SBHLibraryAdditionalItemsIndicatorIconImageView
 - (void)layoutSubviews {
     %orig;
-    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
     
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
     if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
         
-        for (UIView *subview in self.subviews) {
-            if ([subview isKindOfClass:[UIVisualEffectView class]]) {
-                [subview removeFromSuperview];
-            }
-        }
-        
-        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleRegular];
-        UIVisualEffectView *blurEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-        
-        blurEffectView.frame = self.bounds;
-        blurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        blurEffectView.layer.cornerRadius = 13.5;
-        blurEffectView.layer.masksToBounds = YES;
-        blurEffectView.alpha = 0.4;
-        
-        [self insertSubview:blurEffectView atIndex:0];
-    }
-}
+//        NSLog(@"Before reset: %@", NSStringFromCGAffineTransform(self.transform));
 
+        self.translatesAutoresizingMaskIntoConstraints = YES;
+        self.transform = CGAffineTransformIdentity;
+
+//        NSLog(@"After reset: %@", NSStringFromCGAffineTransform(self.transform));
+
+        CGAffineTransform originalIconView = self.transform;
+        self.transform = CGAffineTransformMake(
+                                                1.45,
+                                                originalIconView.b,
+                                                originalIconView.c,
+                                                1.45,
+                                                originalIconView.tx - 0.5,
+                                                originalIconView.ty - 0.5
+                                                );
+
+//        NSLog(@"After new transform: %@", NSStringFromCGAffineTransform(self.transform));
+    }
+    return %orig;
+}
 %end
