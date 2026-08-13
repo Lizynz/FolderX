@@ -8,7 +8,7 @@ Tweak for folder iOS/iPadOS 14.x - 18.x (Dopamine and palera1n).
 - [x] Style (Default & iOS 9);
 - [ ] Color Settings (not working);
 - [x] Hide Animation
-- [ ] Hide Background (Safe Mode);
+- [x] Hide Background (update);
 - [x] Hide Title on Home Screen (update);
 - [x] Hide Title in Folder
 - [x] Hide Label in Folder

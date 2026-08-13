@@ -47,7 +47,14 @@ static NSString *domain = @"com.lizynz.folderx";
         blurView.alpha = 0.0;
         
         blurView.layer.masksToBounds = YES;
-        blurView.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+        
+        if (@available(iOS 26, *)) {
+            SBHFloatyFolderVisualConfiguration *configuration = [[%c(SBHFloatyFolderVisualConfiguration) alloc] init];
+            blurView.layer.cornerRadius = (CGFloat)configuration.continuousCornerRadius;
+        } else {
+            blurView.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+        }
+        
         [view addSubview:blurView];
         
         return (SBFolderTitleTextField*)view;
@@ -70,7 +77,14 @@ static NSString *domain = @"com.lizynz.folderx";
         blurView.alpha = 0.2;
         
         blurView.layer.masksToBounds = YES;
-        blurView.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+        
+        if (@available(iOS 26, *)) {
+            SBHFloatyFolderVisualConfiguration *configuration = [[%c(SBHFloatyFolderVisualConfiguration) alloc] init];
+            blurView.layer.cornerRadius = (CGFloat)configuration.continuousCornerRadius;
+        } else {
+            blurView.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+        }
+        
         [view addSubview:blurView];
         
         BOOL isInDarkMode = ([[UITraitCollection currentTraitCollection] userInterfaceStyle] == UIUserInterfaceStyleDark);
@@ -85,7 +99,13 @@ static NSString *domain = @"com.lizynz.folderx";
             blurView.alpha = 0.2;
             
             blurView.layer.masksToBounds = YES;
-            blurView.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+            
+            if (@available(iOS 26, *)) {
+                SBHFloatyFolderVisualConfiguration *configuration = [[%c(SBHFloatyFolderVisualConfiguration) alloc] init];
+                blurView.layer.cornerRadius = (CGFloat)configuration.continuousCornerRadius;
+            } else {
+                blurView.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+            }
             
             [view addSubview:blurView];
         }
@@ -173,7 +193,13 @@ static NSString *domain = @"com.lizynz.folderx";
         NSDictionary *fbackgroundColorDict = [[NSUserDefaults standardUserDefaults] objectForKey:@"fbackgroundColorDict" inDomain:domain];
         
         self.layer.masksToBounds = YES;
-        self.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+        
+        if (@available(iOS 26, *)) {
+            SBHFloatyFolderVisualConfiguration *configuration = [[%c(SBHFloatyFolderVisualConfiguration) alloc] init];
+            self.layer.cornerRadius = (CGFloat)configuration.continuousCornerRadius;
+        } else {
+            self.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+        }
         
         [self setBackgroundColor:[UIColor colorWithRed:[fbackgroundColorDict[@"red"] floatValue] green:[fbackgroundColorDict[@"green"] floatValue] blue:[fbackgroundColorDict[@"blue"] floatValue] alpha:[fbackgroundColorDict[@"alpha"] floatValue]]];
     }
@@ -203,10 +229,16 @@ static NSString *domain = @"com.lizynz.folderx";
         blurView.alpha = 0.2;
         
         blurView.layer.masksToBounds = YES;
-        blurView.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+        
+        if (@available(iOS 26, *)) {
+            SBHFloatyFolderVisualConfiguration *configuration = [[%c(SBHFloatyFolderVisualConfiguration) alloc] init];
+            blurView.layer.cornerRadius = (CGFloat)configuration.continuousCornerRadius;
+        } else {
+            blurView.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+        }
         
         CGRect newFrame = blurView.frame;
-        newFrame.size = [%c(SBFolderBackgroundView) folderBackgroundSize];
+//        newFrame.size = [%c(SBFolderBackgroundView) folderBackgroundSize];
         blurView.frame = newFrame;
         
         [view addSubview:blurView];
@@ -223,10 +255,16 @@ static NSString *domain = @"com.lizynz.folderx";
             blurView.alpha = 0.2;
             
             blurView.layer.masksToBounds = YES;
-            blurView.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+            
+            if (@available(iOS 26, *)) {
+                SBHFloatyFolderVisualConfiguration *configuration = [[%c(SBHFloatyFolderVisualConfiguration) alloc] init];
+                blurView.layer.cornerRadius = (CGFloat)configuration.continuousCornerRadius;
+            } else {
+                blurView.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+            }
             
             CGRect newFrame = blurView.frame;
-            newFrame.size = [%c(SBFolderBackgroundView) folderBackgroundSize];
+//            newFrame.size = [%c(SBFolderBackgroundView) folderBackgroundSize];
             blurView.frame = newFrame;
             
             [view addSubview:blurView];
