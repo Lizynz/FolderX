@@ -115,68 +115,111 @@ static NSString *domain = @"com.lizynz.folderx";
 }
 %end
 
+//%hook SBIconView // ≤ iOS 18
+//- (id)_legibilitySettingsWithParameters:(id)arg1 {
+//    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+//    if (prefs) {
+//        TextColor = [prefs objectForKey:@"TC"] ? [[prefs objectForKey:@"TC"] intValue] : TextColor;
+//    }
+//    
+//    if (TextColor == 1) {
+//        return %orig;
+//    }
+//
+//    if (TextColor == 2) { //Color
+//        id view = %orig;
+//        
+//        NSDictionary *textColorDict = [[NSUserDefaults standardUserDefaults] objectForKey:@"textColorDict" inDomain:domain];
+//        
+//        if (HideFolderLabel(self)) {
+//            view = [self _legibilitySettingsWithPrimaryColor:[UIColor colorWithRed:[textColorDict[@"red"] floatValue] green:[textColorDict[@"green"] floatValue] blue:[textColorDict[@"blue"] floatValue] alpha:[textColorDict[@"alpha"] floatValue]]];
+//        }
+//        return view;
+//    }
+//    return %orig;
+//}
+//
+//%end
+
+// Thanks to Nightwind for the original implementation https://github.com/NightwindDev/MatchingIconLabels/blob/main/Tweak.x#L30
+
 %hook SBIconView
-- (id)_legibilitySettingsWithParameters:(id)arg1 {
+
+- (id)_labelImageParameters {
+    id original = %orig;
+
+    if (!original) {
+        return nil;
+    }
+
+    SBMutableIconLabelImageParameters *param = [original mutableCopy];
+
+    if (!param) {
+        return original;
+    }
+    
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    
     if (prefs) {
         TextColor = [prefs objectForKey:@"TC"] ? [[prefs objectForKey:@"TC"] intValue] : TextColor;
     }
     
     if (TextColor == 1) {
-        return %orig;
+        return original;
     }
-
-    if (TextColor == 2) { //Color
-        id view = %orig;
+    
+    if (TextColor == 2) {
         
         NSDictionary *textColorDict = [[NSUserDefaults standardUserDefaults] objectForKey:@"textColorDict" inDomain:domain];
         
         if (HideFolderLabel(self)) {
-            view = [self _legibilitySettingsWithPrimaryColor:[UIColor colorWithRed:[textColorDict[@"red"] floatValue] green:[textColorDict[@"green"] floatValue] blue:[textColorDict[@"blue"] floatValue] alpha:[textColorDict[@"alpha"] floatValue]]];
+            param.textColor = [UIColor colorWithRed:[textColorDict[@"red"] floatValue] green:[textColorDict[@"green"] floatValue] blue:[textColorDict[@"blue"] floatValue] alpha:[textColorDict[@"alpha"] floatValue]];
         }
-        return view;
-    }
-    return %orig;
-}
-
-%end
-
-%hook SBFolderIconImageView
-- (void)setBackgroundView:(UIView *)arg1 {
-    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
-    if (prefs) {
-        IconColor = [prefs objectForKey:@"IC"] ? [[prefs objectForKey:@"IC"] intValue] : IconColor;
-    }
-    if (IconColor == 1) {
-        return %orig;
-    }
-
-    if (IconColor == 2) {
-        NSDictionary *ficonColorDict = [[NSUserDefaults standardUserDefaults] objectForKey:@"ficonColorDict" inDomain:domain];
         
-        self.backgroundView.layer.masksToBounds = YES;
-        self.backgroundView.layer.cornerRadius = 13.5;
-        
-        [self.backgroundView setBackgroundColor:[UIColor colorWithRed:[ficonColorDict[@"red"] floatValue] green:[ficonColorDict[@"green"] floatValue] blue:[ficonColorDict[@"blue"] floatValue] alpha:[ficonColorDict[@"alpha"] floatValue]]];
-    }
-}
-
-%end
-
-%hook SBHLibraryAdditionalItemsIndicatorIconImageView
-- (void)layoutSubviews {
-    %orig;
-    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
-    if (prefs) {
-        IconColor = [prefs objectForKey:@"IC"] ? [[prefs objectForKey:@"IC"] intValue] : IconColor;
+        return param;
     }
     
-    if (IconColor == 2) {
-        [self.backgroundView setBackgroundColor:[UIColor clearColor]];
-    }
+    return original;
 }
 
 %end
+
+//%hook SBFolderIconImageView
+//- (void)setBackgroundView:(UIView *)arg1 {
+//    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+//    if (prefs) {
+//        IconColor = [prefs objectForKey:@"IC"] ? [[prefs objectForKey:@"IC"] intValue] : IconColor;
+//    }
+//    if (IconColor == 1) {
+//        return %orig;
+//    }
+//
+//    if (IconColor == 2) {
+//        NSDictionary *ficonColorDict = [[NSUserDefaults standardUserDefaults] objectForKey:@"ficonColorDict" inDomain:domain];
+//        
+//        self.backgroundView.layer.masksToBounds = YES;
+//        self.backgroundView.layer.cornerRadius = 13.5;
+//        
+//        [self.backgroundView setBackgroundColor:[UIColor colorWithRed:[ficonColorDict[@"red"] floatValue] green:[ficonColorDict[@"green"] floatValue] blue:[ficonColorDict[@"blue"] floatValue] alpha:[ficonColorDict[@"alpha"] floatValue]]];
+//    }
+//}
+//
+//%end
+//
+//%hook SBHLibraryAdditionalItemsIndicatorIconImageView
+//- (void)layoutSubviews {
+//    %orig;
+//    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+//    if (prefs) {
+//        IconColor = [prefs objectForKey:@"IC"] ? [[prefs objectForKey:@"IC"] intValue] : IconColor;
+//    }
+//    
+//    if (IconColor == 2) {
+//        [self.backgroundView setBackgroundColor:[UIColor clearColor]];
+//    }
+//}
+//
+//%end
 
 %hook SBFolderBackgroundView
 - (void)layoutSubviews {

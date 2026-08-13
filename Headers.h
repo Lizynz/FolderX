@@ -28,8 +28,13 @@
 @property (nonatomic, retain) UIView *backgroundView;
 @end
 
+@interface SBFolderController : UIViewController
+- (BOOL)isOpen;
+@end
+
 @interface SBHIconManager : NSObject
 - (void)closeFolderAnimated:(BOOL)arg1 withCompletion:(id)arg2;
+- (SBFolderController *)openedFolderController;
 @end
 
 @interface SBIconListView : UIView
@@ -40,10 +45,6 @@
 @property(copy, nonatomic) NSString *displayName;
 - (NSArray *)icons;
 - (id)allIcons;
-@end
-
-@interface SBFolderController : UIViewController
-- (BOOL)isOpen;
 @end
 
 @interface SBIconController : UIViewController
@@ -87,4 +88,8 @@
 
 @interface SBHFloatyFolderVisualConfiguration : NSObject
 @property (nonatomic) double continuousCornerRadius;
+@end
+
+@interface SBMutableIconLabelImageParameters : NSObject
+@property (nonatomic, strong) UIColor *textColor;
 @end
