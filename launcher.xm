@@ -512,17 +512,33 @@ static NSString *bid = @"";
 
 %hook SBIconView
 - (id)_labelImageParameters {
-    SBMutableIconLabelImageParameters *param = %orig;
-    
-    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
-    if ([[prefs objectForKey:@"hidefoldertitlehs"] boolValue]) {
-        if([self.icon isKindOfClass:[%c(SBFolderIcon) class]]){
+    NSDictionary *prefs =
+        [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+
+    if ([[prefs objectForKey:@"hidefoldertitlehs"] boolValue] &&
+        [self.icon isKindOfClass:[%c(SBFolderIcon) class]]) {
+
+        if (@available(iOS 26, *)) {
+            SBIconLabelImageParameters *original = %orig;
+            SBMutableIconLabelImageParameters *param = [original mutableCopy];
+
             SBFolderIcon *folderIcon = (SBFolderIcon*)self.icon;
             bid = folderIcon.nodeIdentifier;
             param.textColor = [UIColor clearColor];
-        }}
-    
-    return param;
+
+            return param;
+        } else {
+            SBMutableIconLabelImageParameters *param = %orig;
+            
+            SBFolderIcon *folderIcon = (SBFolderIcon*)self.icon;
+            bid = folderIcon.nodeIdentifier;
+            param.textColor = [UIColor clearColor];
+
+            return param;
+        }
+    }
+
+    return %orig;
 }
 
 %end

@@ -50,8 +50,15 @@ static CGFloat folderSize;
 }
 
 - (void)setCornerRadius:(double)arg1 {
-    arg1 = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
-    %orig(arg1);
+    if (@available(iOS 26, *)) {
+        SBHFloatyFolderVisualConfiguration *configuration =
+            [[%c(SBHFloatyFolderVisualConfiguration) alloc] init];
+
+        %orig(configuration.continuousCornerRadius);
+    } else {
+        arg1 = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+        %orig(arg1);
+    }
 }
 
 - (BOOL)_showsTitle {
@@ -385,31 +392,31 @@ int TITLE = 2;
 %end
 
 %hook SBHLibraryAdditionalItemsIndicatorIconImageView
+
 - (void)layoutSubviews {
     %orig;
-    
+
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+
     if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
-        
-//        NSLog(@"Before reset: %@", NSStringFromCGAffineTransform(self.transform));
 
-        self.translatesAutoresizingMaskIntoConstraints = YES;
-        self.transform = CGAffineTransformIdentity;
+        if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"15.0") && SYSTEM_VERSION_LESS_THAN(@"18.0")) { //No change required on iOS 18
 
-//        NSLog(@"After reset: %@", NSStringFromCGAffineTransform(self.transform));
+            self.translatesAutoresizingMaskIntoConstraints = YES;
+            self.transform = CGAffineTransformIdentity;
 
-        CGAffineTransform originalIconView = self.transform;
-        self.transform = CGAffineTransformMake(
-                                                1.45,
-                                                originalIconView.b,
-                                                originalIconView.c,
-                                                1.45,
-                                                originalIconView.tx - 0.5,
-                                                originalIconView.ty - 0.5
-                                                );
+            CGAffineTransform originalIconView = self.transform;
 
-//        NSLog(@"After new transform: %@", NSStringFromCGAffineTransform(self.transform));
+            self.transform = CGAffineTransformMake(
+                1.45,
+                originalIconView.b,
+                originalIconView.c,
+                1.45,
+                originalIconView.tx - 0.5,
+                originalIconView.ty - 0.5
+            );
+        }
     }
-    return %orig;
 }
+
 %end

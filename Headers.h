@@ -6,6 +6,9 @@
 
 #define kRWSettingsPath @"/var/jb/var/mobile/Library/Preferences/com.lizynz.folderx.plist"
 
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+#define SYSTEM_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
+
 @interface NSUserDefaults (FolderX)
 - (id)objectForKey:(NSString *)key inDomain:(NSString *)domain;
 - (void)setObject:(id)value forKey:(NSString *)key inDomain:(NSString *)domain;
@@ -80,4 +83,8 @@
 @interface SBHLibraryAdditionalItemsIndicatorIconImageView : SBFolderIconImageView
 @property (nonatomic, assign) CGAffineTransform transform;
 - (unsigned long long)concreteBackgroundStyle;
+@end
+
+@interface SBHFloatyFolderVisualConfiguration : NSObject
+@property (nonatomic) double continuousCornerRadius;
 @end
