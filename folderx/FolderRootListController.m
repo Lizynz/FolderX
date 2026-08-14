@@ -76,11 +76,13 @@ static NSBundle *tweakBundle = nil;
 }
 
 - (void)twitter {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://mobile.twitter.com/Lizynz1"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication]
+        openURL:[NSURL URLWithString:@"https://x.com/Lizynz1"]];
 }
 
 - (void)github {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/Lizynz/FolderX"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication]
+        openURL:[NSURL URLWithString:@"https://github.com/Lizynz/FolderX"]];
 }
 @end
 

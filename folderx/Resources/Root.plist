@@ -329,22 +329,18 @@
 			<string>Author</string>
 	</dict>
 	<dict>
-			<key>cell</key>
-			<string>PSLinkCell</string>
 			<key>action</key>
 			<string>github</string>
-			<key>icon</key>
-			<string>github.png</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
 			<key>label</key>
 			<string>GitHub</string>
 	</dict>
-        <dict>
-                        <key>cell</key>
-			<string>PSLinkCell</string>
+	<dict>
 			<key>action</key>
 			<string>twitter</string>
-			<key>icon</key>
-			<string>twitter.png</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
 			<key>label</key>
 			<string>Developer Twitter</string>
 	</dict>
