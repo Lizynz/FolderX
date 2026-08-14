@@ -101,8 +101,12 @@ static NSBundle *tweakBundle = nil;
 
 - (void)refreshCellContentsWithSpecifier:(PSSpecifier *)specifier {
     [super refreshCellContentsWithSpecifier:specifier];
+
+    self.accessoryView = self.control;
+
     self.control.minimumValue = [specifier.properties[@"min"] doubleValue];
     self.control.maximumValue = [specifier.properties[@"max"] doubleValue];
+
     [self _updateLabel];
 }
 
@@ -168,8 +172,12 @@ static NSBundle *tweakBundle = nil;
 
 - (void)refreshCellContentsWithSpecifier:(PSSpecifier *)specifier {
     [super refreshCellContentsWithSpecifier:specifier];
+
+    self.accessoryView = self.control;
+
     self.control.minimumValue = [specifier.properties[@"min"] doubleValue];
     self.control.maximumValue = [specifier.properties[@"max"] doubleValue];
+
     [self _updateLabel];
 }
 
@@ -180,14 +188,13 @@ static NSBundle *tweakBundle = nil;
 
 - (UIStepper *)newControl {
     UIStepper *stepper = [[UIStepper alloc] initWithFrame:CGRectZero];
+
     stepper.continuous = NO;
-    
-    stepper.minimumValue = 5;
-    stepper.maximumValue = 30;
-    
+    stepper.minimumValue = 40;
+    stepper.maximumValue = 60;
     stepper.stepValue = 5;
-    stepper.value = 30;
-    
+    stepper.value = 40;
+
     return stepper;
 }
 
