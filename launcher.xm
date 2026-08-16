@@ -5,6 +5,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <CoreData/CoreData.h>
+#include <roothide.h>
 
 @interface UIApplication (poop)
 - (void)launchApplicationWithIdentifier: (NSString*)identifier suspended: (BOOL)suspended;
@@ -14,9 +15,20 @@
 - (void)setFlag:(long long)arg1 forActivationSetting:(unsigned)arg2 ;
 @end
 
+@interface SBIcon : NSObject
+@property (nonatomic, readonly, copy) NSString *displayName;
+@property (nonatomic, readonly) long long badgeValue;
+- (bool)isApplicationIcon;
+- (bool)isBookmarkIcon;
+- (bool)isWidgetIcon;
+- (bool)isWidgetStackIcon;
+- (id)applicationBundleID;
+@end
+
 @interface SBIconListView : UIView
 - (void)hideAllIcons;
 - (void)showAllIcons;
+- (SBIconView *)displayedIconViewForIcon:(SBIcon *)icon;
 @end
 
 @interface SBApplication : NSObject
@@ -39,16 +51,6 @@
 - (id)bundleIdentifier;
 @end
 
-@interface SBIcon : NSObject
-@property (nonatomic, readonly, copy) NSString *displayName;
-@property (nonatomic, readonly) long long badgeValue;
-- (bool)isApplicationIcon;
-- (bool)isBookmarkIcon;
-- (bool)isWidgetIcon;
-- (bool)isWidgetStackIcon;
-- (id)applicationBundleID;
-@end
-
 @interface SBLeafIcon : SBIcon
 @end
 
@@ -68,11 +70,11 @@
 - (id)nodeIdentifier;
 @end
 
-@interface SBIconView : UIView
-@property (nonatomic, retain) SBIcon *icon;
-@property (nonatomic, retain) SBFolderIcon *folderIcon;
-- (bool)isFolderIcon;
-@end
+//@interface SBIconView : UIView
+//@property (nonatomic, retain) SBIcon *icon;
+//@property (nonatomic, retain) SBFolderIcon *folderIcon;
+//- (bool)isFolderIcon;
+//@end
 
 @interface SBIconImageView : UIView
 @property (assign,nonatomic) SBIconView * iconView;
@@ -81,6 +83,14 @@
 @end
 
 @interface SBIconListPageControl : UIView
+@end
+
+@interface UITraitOverrides : NSObject
+@property (nonatomic) UIUserInterfaceStyle userInterfaceStyle;
+@end
+
+@interface UIViewController (TraitOverrides)
+@property (nonatomic, readonly) UITraitOverrides *traitOverrides;
 @end
 
 @interface UIImage (UIApplicationIconPrivate)
@@ -201,7 +211,13 @@ static BOOL ios15 = YES;
             
             UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
             layout.scrollDirection = UICollectionViewScrollDirectionVertical;
-            layout.itemSize = CGSizeMake(75, 75);
+            layout.itemSize = CGSizeMake(75, 85); // 95 with label
+            
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+                layout.sectionInset = UIEdgeInsetsMake(25, 12, 0, 12);
+            } else {
+                layout.sectionInset = UIEdgeInsetsMake(25, 24, 0, 12);
+            }
             
             self.collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(naviView.frame), folderView.frame.size.width, folderView.frame.size.height - CGRectGetMaxY(naviView.frame)) collectionViewLayout:layout];
             
@@ -263,7 +279,13 @@ static BOOL ios15 = YES;
             
             UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
             layout.scrollDirection = UICollectionViewScrollDirectionVertical;
-            layout.itemSize = CGSizeMake(75, 75);
+            layout.itemSize = CGSizeMake(75, 85); // 95 with label
+            
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+                layout.sectionInset = UIEdgeInsetsMake(25, 12, 0, 12);
+            } else {
+                layout.sectionInset = UIEdgeInsetsMake(25, 24, 0, 12);
+            }
             
             self.collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, folderView.frame.size.width, folderView.frame.size.height) collectionViewLayout:layout];
 
@@ -320,10 +342,21 @@ static BOOL ios15 = YES;
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     %orig;
-    if (![self isMemberOfClass:%c(SBFolderController)] && ![self isMemberOfClass:%c(SBFloatyFolderController)]) {
+
+    if (![self isMemberOfClass:%c(SBFolderController)] &&
+        ![self isMemberOfClass:%c(SBFloatyFolderController)]) {
         return;
     }
+
     [self.collectionView reloadData];
+
+    if ([self.traitCollection
+            hasDifferentColorAppearanceComparedToTraitCollection:
+                previousTraitCollection]) {
+
+        self.presentedViewController.traitOverrides.userInterfaceStyle =
+            self.traitCollection.userInterfaceStyle;
+    }
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -371,9 +404,15 @@ static BOOL ios15 = YES;
 %new
 - (void)folderIcons {
     self.iconEntries = [[NSMutableArray alloc] init];
-    for (SBApplicationIcon *icon in self.icons) {
-        FXIcon *newEntry = [[FXIcon alloc] initWithApplication:icon.application];
-        [self.iconEntries addObject: newEntry];
+    for (SBIcon *icon in self.icons) {
+        if ([icon isApplicationIcon]) {
+            SBApplicationIcon *appIcon = (SBApplicationIcon *)icon;
+            FXIcon *newEntry = [[FXIcon alloc] initWithApplication:appIcon.application];
+            [self.iconEntries addObject:newEntry];
+        } else if ([icon isBookmarkIcon]) {
+            FXIcon *newEntry = [[FXIcon alloc] initWithApplication:nil];
+            [self.iconEntries addObject:newEntry];
+        }
     }
 }
 
@@ -384,7 +423,7 @@ static BOOL ios15 = YES;
 
 %new
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    if (self.icons.count < 1) { // Если количество иконок равно нулю или меньше единицы, закрываем контроллер представления.
+    if (self.icons.count < 1) { // If there are no icons, close the view controller.
         [self dismissViewControllerAnimated:YES completion:nil];
     }
     return self.icons.count;
@@ -402,95 +441,72 @@ static BOOL ios15 = YES;
     FXIcon *entry = self.iconEntries[indexPath.item];
     
     cell.entry = entry;
+
+    SBIcon *icon = self.icons[indexPath.item];
     
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
     if ([[prefs objectForKey:@"HideLauncherLabel"] boolValue]) {
-        //no label
+        cell.textLabel.text = @"";
     } else {
-        cell.textLabel.text = entry.application.displayName;
+        if ([icon isBookmarkIcon]) {
+            SBBookmarkIcon *bookmarkIcon = (SBBookmarkIcon *)icon;
+            cell.textLabel.text = bookmarkIcon.displayName;
+        } else if ([icon isApplicationIcon]) {
+            SBApplicationIcon *applicationIcon = (SBApplicationIcon *)icon;
+            cell.textLabel.text = applicationIcon.application.displayName;
+        } else {
+            cell.textLabel.text = @"";
+        }
         cell.textLabel.backgroundColor = [UIColor clearColor];
+    }
+
+    if ([icon isKindOfClass:%c(SBIcon)]) {
+        [cell setSBIcon:icon];
         
-        SBBookmarkIcon *selectedIcon = self.icons[indexPath.item];
-        if ([selectedIcon isBookmarkIcon]) {
-            cell.textLabel.text = selectedIcon.displayName;
+        SBIconView *realIconView = [self.customListView displayedIconViewForIcon:icon];
+        
+        if (realIconView) {
+            cell.iconView.overrideActionDelegate = [realIconView actionDelegate];
         }
     }
-    
-    UIView *newView = [[UIView alloc] initWithFrame:cell.frame];
+
+    UIView *newView = [[UIView alloc] initWithFrame:cell.bounds];
     newView.backgroundColor = [UIColor clearColor];
-    newView.layer.cornerRadius = 16;
+    newView.layer.cornerRadius = 16.0;
     cell.selectedBackgroundView = newView;
+    cell.layer.cornerRadius = 16.0;
     
-    cell.layer.cornerRadius = 16;
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-        SBApplication *application = entry.application;
-        UIImage *cellImage;
-        NSMutableArray *bookmarkIcons = [NSMutableArray array];
+    if ([icon isApplicationIcon]) {
+        SBApplicationIcon *applicationIcon = (SBApplicationIcon *)icon;
         
-        if (application.bundleIdentifier && ![application.bundleIdentifier isEqualToString:@""]) {
-            cellImage = [UIImage _applicationIconImageForBundleIdentifier:application.bundleIdentifier format:10 scale:[UIScreen mainScreen].scale];
-        } else {
-            cellImage = [UIImage systemImageNamed:@"exclamationmark.circle"]; // no Bundle ID
+        SBApplication *application = applicationIcon.application;
+        if (application.badgeValue != nil) {
+            if (!cell.badgeView) {
+                cell.badgeView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 17, 17)];
+                cell.badgeView.layer.cornerRadius = cell.badgeView.frame.size.width / 2.0;
+                cell.badgeView.backgroundColor = [UIColor redColor];
+                [collectionView addSubview:cell.badgeView];
+            }
             
-            SBBookmarkIcon *selectedIcon = self.icons[indexPath.item];
-            if ([selectedIcon isBookmarkIcon]) {
-                UIImage *iconImage = [[selectedIcon webClip] iconImage];
-                if (iconImage) {
-                    [bookmarkIcons addObject:iconImage];
-                } else {
-                    UIImage *placeholderImage = [UIImage systemImageNamed:@"exclamationmark.circle"];
-                    [bookmarkIcons addObject:placeholderImage];
-                }
-            } else {
-                UIImage *placeholderImage = [UIImage systemImageNamed:@"exclamationmark.circle"];
-                [bookmarkIcons addObject:placeholderImage];
-            }
+            cell.badgeTextLabel.text = [application.badgeValue stringValue];
+            [cell.badgeTextLabel sizeToFit];
+            
+            UICollectionViewLayout *layout = collectionView.collectionViewLayout;
+            UICollectionViewLayoutAttributes *attributes = [layout layoutAttributesForItemAtIndexPath:indexPath];
+            
+            CGRect cellRect = attributes.frame;
+            CGRect badgeRect = cell.badgeView.frame;
+            badgeRect.origin = [collectionView convertPoint:cellRect.origin fromView:collectionView.superview];
+            badgeRect.origin.x = CGRectGetMaxX(cellRect) - badgeRect.size.width - 4;
+            badgeRect.origin.y = cellRect.origin.y + (cellRect.size.height - badgeRect.size.height) / 6 - badgeRect.size.height / 2;
+            cell.badgeView.frame = badgeRect;
+            cell.badgeView.hidden = NO;
+        } else {
+            cell.badgeView.hidden = YES;
         }
-        
-        if (bookmarkIcons.count > 0) {
-            NSUInteger index = indexPath.item % bookmarkIcons.count;
-            cellImage = bookmarkIcons[index];
-        }
-        
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            FXCollectionViewCell *cell = (FXCollectionViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
-            cell.imageView.image = cellImage;
-            SBBookmarkIcon *selectedIcon = self.icons[indexPath.item];
-            if ([selectedIcon isBookmarkIcon]) {
-                cell.imageView.layer.cornerRadius = cell.imageView.frame.size.width / 5;
-                cell.imageView.clipsToBounds = YES;
-            }
-            [cell setNeedsLayout];
-        });
-    });
-    
-    if (entry.application.badgeValue != nil) {
-        if (!cell.badgeView) {
-            cell.badgeView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 17, 17)];
-//            [cell setupBadgeView:@""]; //отображает цифры
-            cell.badgeView.layer.cornerRadius = cell.badgeView.frame.size.width / 2;
-            cell.badgeView.backgroundColor = [UIColor redColor];
-            [collectionView addSubview:cell.badgeView];
-        }
-        
-        cell.badgeTextLabel.text = [entry.application.badgeValue stringValue];
-        [cell.badgeTextLabel sizeToFit];
-        
-        UICollectionViewLayout *layout = collectionView.collectionViewLayout;
-        UICollectionViewLayoutAttributes *attributes = [layout layoutAttributesForItemAtIndexPath:indexPath];
-        
-        CGRect cellRect = attributes.frame;
-        CGRect badgeRect = [cell.badgeView frame];
-        badgeRect.origin = [collectionView convertPoint:cellRect.origin fromView:collectionView.superview];
-        badgeRect.origin.x = CGRectGetMaxX(cellRect) - badgeRect.size.width - 4;
-        badgeRect.origin.y = cellRect.origin.y + (cellRect.size.height - badgeRect.size.height) / 6 - badgeRect.size.height / 2;
-        [cell.badgeView setFrame:badgeRect];
-        cell.badgeView.hidden = NO;
     } else {
         cell.badgeView.hidden = YES;
     }
-    
     return cell;
 }
 

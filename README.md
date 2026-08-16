@@ -15,6 +15,6 @@ Tweak for folder iOS/iPadOS 14.x - 18.x (Dopamine and palera1n).
 - [x] Hide Page Dots
 - [x] Auto Close Folder (update);
 - [x] Tap to Close Folder
-- [x] Launcher (all functions);
+- [x] Launcher (update);
 - [x] Drag Multi Folders
 - [x] Drag Multi Widgets

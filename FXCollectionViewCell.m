@@ -1,45 +1,75 @@
 #import "FXCollectionViewCell.h"
 #import <objc/runtime.h>
+#import <objc/message.h>
+
+@class SBIconView;
 
 @implementation FXCollectionViewCell
+
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
+
     if (self) {
-        self.imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, -5, frame.size.width, frame.size.height)];
-        [self.contentView addSubview:self.imageView];
-        
-        self.textLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, frame.size.height - 15, frame.size.width, 20)];
-        self.textLabel.font = [UIFont boldSystemFontOfSize:9];
-        self.textLabel.textColor = [UIColor labelColor];
-        self.textLabel.textAlignment = NSTextAlignmentCenter;
-        [self.contentView addSubview:self.textLabel];
+        self.backgroundColor = UIColor.clearColor;
+        self.contentView.backgroundColor = UIColor.clearColor;
+
+        Class SBIconViewClass = objc_getClass("SBIconView");
+
+        if (SBIconViewClass) {
+            self.iconView = [[SBIconViewClass alloc]
+                initWithFrame:CGRectMake(0, 0, 60, 82)];
+
+            self.iconView.labelHidden = YES; // Hide label
+            self.iconView.allowsLabelArea = YES;
+
+            [self.contentView addSubview:self.iconView];
+        }
     }
     return self;
 }
 
-- (void)setupBadgeView:(NSString *)badgeText {
-    UIView *badgeView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
-    badgeView.layer.cornerRadius = badgeView.frame.size.width / 2;
-    badgeView.backgroundColor = [UIColor redColor];
-    [self addSubview:badgeView];
-
-    UILabel *badgeTextLabel = [[UILabel alloc] init];
-    badgeTextLabel.text = badgeText;
-    badgeTextLabel.textAlignment = NSTextAlignmentCenter;
-    badgeTextLabel.font = [UIFont boldSystemFontOfSize:12];
-    [badgeTextLabel sizeToFit];
-    badgeTextLabel.frame = CGRectOffset(badgeTextLabel.frame, 6, 2);
-    badgeTextLabel.textColor = [UIColor whiteColor];
-
-    [badgeView addSubview:badgeTextLabel];
-
-    self.badgeView = badgeView;
-    self.badgeTextLabel = badgeTextLabel;
+- (void)setSBIcon:(SBIcon *)icon {
+    self.iconView.icon = icon;
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    self.imageView.bounds = CGRectMake(0, 0, 52, 52);
+
+    self.iconView.frame = CGRectMake(
+        (CGRectGetWidth(self.contentView.bounds) - 60) / 2.0,
+        -5,
+        60,
+        82
+    );
+}
+
+- (void)prepareForReuse {
+    [super prepareForReuse];
+
+    self.iconView.icon = nil;
+
+    [self.badgeView removeFromSuperview];
+    self.badgeView = nil;
+    self.badgeTextLabel = nil;
+}
+
+- (void)setupBadgeView:(NSString *)badgeText {
+    UIView *badgeView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
+    badgeView.layer.cornerRadius = 10;
+    badgeView.backgroundColor = UIColor.redColor;
+    
+    [self.contentView addSubview:badgeView];
+
+    UILabel *label = [[UILabel alloc] initWithFrame:badgeView.bounds];
+    label.text = badgeText;
+    label.textAlignment = NSTextAlignmentCenter;
+    label.font = [UIFont boldSystemFontOfSize:12];
+    label.textColor = UIColor.whiteColor;
+    
+    [badgeView addSubview:label];
+
+    self.badgeView = badgeView;
+    self.badgeTextLabel = label;
 }
 
 @end
