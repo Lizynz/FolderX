@@ -1,19 +1,10 @@
 #import "FXCollectionViewCell.h"
-#import "FXIcon.h"
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <CoreData/CoreData.h>
 #include <roothide.h>
-
-@interface UIApplication (poop)
-- (void)launchApplicationWithIdentifier: (NSString*)identifier suspended: (BOOL)suspended;
-@end
-
-@interface SBActivationSettings : NSObject
-- (void)setFlag:(long long)arg1 forActivationSetting:(unsigned)arg2 ;
-@end
 
 @interface SBIcon : NSObject
 @property (nonatomic, readonly, copy) NSString *displayName;
@@ -93,11 +84,6 @@
 @property (nonatomic, readonly) UITraitOverrides *traitOverrides;
 @end
 
-@interface UIImage (UIApplicationIconPrivate)
-+ (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(CGFloat)scale;
-+ (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format;
-@end
-
 @interface SBFolderController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UIGestureRecognizerDelegate, UIPopoverPresentationControllerDelegate, UITextFieldDelegate>
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSString *cellReuseIdentifier;
@@ -105,10 +91,8 @@
 @property (nonatomic, strong) NSArray *icons;
 @property (nonatomic, strong) SBIconListView *customListView;
 @property (nonatomic,copy,readonly) NSArray *iconListViews;
-@property (nonatomic, strong) NSMutableArray *iconEntries;
 @property (retain, nonatomic) SBIconListPageControl *pageControl;
 - (void)deselectAllItems;
-- (void)folderIcons;
 @end
 
 #define kRWSettingsPath @"/var/jb/var/mobile/Library/Preferences/com.lizynz.folderx.plist"
@@ -126,7 +110,6 @@ static BOOL ios15 = YES;
 %property (nonatomic, strong) UICollectionView *collectionView;
 %property (nonatomic, strong) SBIconListView *customListView;
 %property (nonatomic, strong) NSString *cellReuseIdentifier;
-%property (nonatomic, strong) NSMutableArray *iconEntries;
 
 - (void)viewDidLoad {
     %orig;
@@ -189,9 +172,6 @@ static BOOL ios15 = YES;
     if (gestureRecognizer.state == UIGestureRecognizerStateRecognized) {
         self.cellReuseIdentifier = @"FXCells";
         self.customListView = self.iconListViews.firstObject;
-        
-        if (ios15)
-        [self folderIcons];
         
         NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
         if ([[prefs objectForKey:@"FolderName"] boolValue]) {
@@ -377,43 +357,6 @@ static BOOL ios15 = YES;
 %new
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [collectionView deselectItemAtIndexPath:indexPath animated:YES];
-    SBActivationSettings *customSettings = [[%c(SBActivationSettings) alloc] init];
-    [customSettings setFlag:1 forActivationSetting:2];
-    
-    [self dismissViewControllerAnimated:YES completion:^{
-        [[UIApplication sharedApplication] launchApplicationWithIdentifier:[[self.iconEntries[indexPath.item] application] bundleIdentifier] suspended:NO];
-    }];
-
-    SBBookmarkIcon *selectedIcon = self.icons[indexPath.item];
-    if ([selectedIcon isBookmarkIcon]) {
-        NSString *pageURLString = [NSString stringWithFormat:@"%@", [[selectedIcon webClip] pageURL]];
-        if (pageURLString) {
-            NSURL *pageURL = [NSURL URLWithString:pageURLString];
-            
-            UIApplication *application = [UIApplication sharedApplication];
-            NSDictionary *options = @{UIApplicationOpenURLOptionUniversalLinksOnly: @NO};
-            
-            [self dismissViewControllerAnimated:YES completion:nil];
-            
-            [application openURL:pageURL options:options completionHandler:^(BOOL success) {
-                if (!success) {}}];
-        }
-    }
-}
-
-%new
-- (void)folderIcons {
-    self.iconEntries = [[NSMutableArray alloc] init];
-    for (SBIcon *icon in self.icons) {
-        if ([icon isApplicationIcon]) {
-            SBApplicationIcon *appIcon = (SBApplicationIcon *)icon;
-            FXIcon *newEntry = [[FXIcon alloc] initWithApplication:appIcon.application];
-            [self.iconEntries addObject:newEntry];
-        } else if ([icon isBookmarkIcon]) {
-            FXIcon *newEntry = [[FXIcon alloc] initWithApplication:nil];
-            [self.iconEntries addObject:newEntry];
-        }
-    }
 }
 
 %new
@@ -438,27 +381,24 @@ static BOOL ios15 = YES;
 %new
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     FXCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:self.cellReuseIdentifier forIndexPath:indexPath];
-    FXIcon *entry = self.iconEntries[indexPath.item];
     
-    cell.entry = entry;
-
     SBIcon *icon = self.icons[indexPath.item];
     
-    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
-    if ([[prefs objectForKey:@"HideLauncherLabel"] boolValue]) {
-        cell.textLabel.text = @"";
-    } else {
-        if ([icon isBookmarkIcon]) {
-            SBBookmarkIcon *bookmarkIcon = (SBBookmarkIcon *)icon;
-            cell.textLabel.text = bookmarkIcon.displayName;
-        } else if ([icon isApplicationIcon]) {
-            SBApplicationIcon *applicationIcon = (SBApplicationIcon *)icon;
-            cell.textLabel.text = applicationIcon.application.displayName;
-        } else {
-            cell.textLabel.text = @"";
-        }
-        cell.textLabel.backgroundColor = [UIColor clearColor];
-    }
+//    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+//    if ([[prefs objectForKey:@"HideLauncherLabel"] boolValue]) {
+//        cell.textLabel.text = @"";
+//    } else {
+//        if ([icon isBookmarkIcon]) {
+//            SBBookmarkIcon *bookmarkIcon = (SBBookmarkIcon *)icon;
+//            cell.textLabel.text = bookmarkIcon.displayName;
+//        } else if ([icon isApplicationIcon]) {
+//            SBApplicationIcon *applicationIcon = (SBApplicationIcon *)icon;
+//            cell.textLabel.text = applicationIcon.application.displayName;
+//        } else {
+//            cell.textLabel.text = @"";
+//        }
+//        cell.textLabel.backgroundColor = [UIColor clearColor];
+//    }
 
     if ([icon isKindOfClass:%c(SBIcon)]) {
         [cell setSBIcon:icon];
@@ -478,7 +418,7 @@ static BOOL ios15 = YES;
     
     if ([icon isApplicationIcon]) {
         SBApplicationIcon *applicationIcon = (SBApplicationIcon *)icon;
-        
+
         SBApplication *application = applicationIcon.application;
         if (application.badgeValue != nil) {
             if (!cell.badgeView) {
