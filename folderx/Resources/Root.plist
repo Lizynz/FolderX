@@ -194,18 +194,6 @@
 			<key>label</key>
 			<string>Hide Animation</string>
 	</dict>
-	<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<false/>
-			<key>defaults</key>
-			<string>com.lizynz.folderx</string>
-			<key>key</key>
-			<string>bfh</string>
-			<key>label</key>
-			<string>Hide Background</string>
-	</dict>
         <dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>

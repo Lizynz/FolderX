@@ -190,15 +190,6 @@ static CGFloat folderSize;
 %end
 
 %hook SBFolderBackgroundView
-- (void)layoutSubviews { // Hide Background
-    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
-    if ([[prefs objectForKey:@"bfh"] boolValue]) {
-        self.alpha = 0;
-        self.hidden = YES;
-        return ;
-    }
-    return %orig;
-}
 
 + (double)cornerRadiusToInsetContent { //folder radius #3
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
@@ -208,6 +199,7 @@ static CGFloat folderSize;
     }
     return 30;
 }
+
 %end
 
 %hook SBFolderController

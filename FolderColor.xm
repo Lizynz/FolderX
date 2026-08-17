@@ -32,37 +32,6 @@ static NSString *domain = @"com.lizynz.folderx";
     return %orig;
 }
 
-- (id)initWithFrame:(CGRect)arg1 {
-    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
-    
-    if ([[prefs objectForKey:@"bfh"] boolValue]) { // Hide Background
-        SBFolderTitleTextField *view = %orig;
-        for (UIView *subview in view.subviews) {
-            if ([subview isKindOfClass:[_UIBackdropView class]]) {
-                [subview removeFromSuperview];
-            }
-        }
-        
-        _UIBackdropView *blurView = [[_UIBackdropView alloc] initWithStyle:2060];
-        blurView.backgroundColor = [UIColor clearColor];
-        blurView.alpha = 0.0;
-        
-        blurView.layer.masksToBounds = YES;
-        
-        if (@available(iOS 26, *)) {
-            SBHFloatyFolderVisualConfiguration *configuration = [[%c(SBHFloatyFolderVisualConfiguration) alloc] init];
-            blurView.layer.cornerRadius = (CGFloat)configuration.continuousCornerRadius;
-        } else {
-            blurView.layer.cornerRadius = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
-        }
-        
-        [view addSubview:blurView];
-        
-        return (SBFolderTitleTextField*)view;
-    }
-    return %orig;
-}
-
 %end
 
 // Thanks to Nightwind for the original implementation https://github.com/NightwindDev/MatchingIconLabels/blob/main/Tweak.x#L30
