@@ -6,7 +6,7 @@ Tweak for folder iOS/iPadOS 14.x - 18.x (Dopamine and palera1n).
 - [ ] Big Folder (haven't checked);
 - [x] Radius (update);
 - [x] Style (Default & iOS 9);
-- [ ] Color Settings (not working);
+- [x] Color Settings (update);
 - [x] Hide Animation
 - [x] Hide Background (update);
 - [x] Hide Title on Home Screen (update);

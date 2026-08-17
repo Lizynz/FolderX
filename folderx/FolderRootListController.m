@@ -254,16 +254,9 @@ static NSBundle *tweakBundle = nil;
             [defaults removeObjectForKey:@"textColorDict"];
             [defaults removeObjectForKey:@"ficonColorDict"];
             [defaults removeObjectForKey:@"fbackgroundColorDict"];
-            
             [defaults synchronize];
 
-            [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:domain];
-            
-            double delayInSeconds = 0.5;
-                dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-            dispatch_after(delayTime, dispatch_get_main_queue(), ^{
-                exit(0);
-            });
+            [self reloadSpecifiers];
         }];
         
         cancelA.attributes = UIMenuElementAttributesDestructive;

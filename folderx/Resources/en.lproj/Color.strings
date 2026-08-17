@@ -4,5 +4,6 @@
 "Folder Name" = "Folder Name";
 "Folder Label" = "Folder Label";
 "Folder Icon" = "Folder Icon";
-"Milk" = "Milk";
+"Only iOS 18 and below" = "Only iOS/iPadOS 18 and below";
 "Folder Background" = "Folder Background";
+"On iOS 26, changes both icon and folder background" = "On iOS/iPadOS 26, changes both icon and folder background";
