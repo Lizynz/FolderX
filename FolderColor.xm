@@ -143,6 +143,10 @@ static NSString *domain = @"com.lizynz.folderx";
     }
 }
 
+//- (BOOL)shouldHaveGlass {
+//    return NO;
+//}
+
 %end
 
 %hook SBHLibraryAdditionalItemsIndicatorIconImageView
@@ -189,6 +193,10 @@ static NSString *domain = @"com.lizynz.folderx";
         [self setBackgroundColor:[UIColor colorWithRed:[fbackgroundColorDict[@"red"] floatValue] green:[fbackgroundColorDict[@"green"] floatValue] blue:[fbackgroundColorDict[@"blue"] floatValue] alpha:[fbackgroundColorDict[@"alpha"] floatValue]]];
     }
 }
+
+//- (BOOL)usesGlass {
+//    return NO;
+//}
 
 %end
 

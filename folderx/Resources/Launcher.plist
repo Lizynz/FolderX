@@ -62,18 +62,6 @@
 			<key>label</key>
 			<string>Sort alphabetically</string>
 	</dict>
-	<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<false/>
-			<key>defaults</key>
-			<string>com.lizynz.folderx</string>
-			<key>key</key>
-			<string>HideLauncherLabel</string>
-			<key>label</key>
-			<string>Hide Label</string>
-	</dict>
 		</array>
 		<key>title</key>
 		<string>Launcher</string>

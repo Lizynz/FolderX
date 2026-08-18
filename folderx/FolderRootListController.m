@@ -119,11 +119,10 @@ static NSBundle *tweakBundle = nil;
 
 - (UIStepper *)newControl {
     UIStepper *stepper = [[UIStepper alloc] initWithFrame:CGRectZero];
-    stepper.continuous = NO;
     
+    stepper.continuous = NO;
     stepper.minimumValue = 40;
     stepper.maximumValue = 60;
-    
     stepper.stepValue = 5;
     stepper.value = 40;
     
@@ -192,10 +191,10 @@ static NSBundle *tweakBundle = nil;
     UIStepper *stepper = [[UIStepper alloc] initWithFrame:CGRectZero];
 
     stepper.continuous = NO;
-    stepper.minimumValue = 40;
-    stepper.maximumValue = 60;
+    stepper.minimumValue = 5;
+    stepper.maximumValue = 35;
     stepper.stepValue = 5;
-    stepper.value = 40;
+    stepper.value = 35;
 
     return stepper;
 }

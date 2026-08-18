@@ -66,7 +66,7 @@
 			<key>min</key>
 			<real>40</real>
 			<key>height</key>
-			<string>40</string>
+			<string>45</string>
 			<key>PostNotification</key>
 			<string>com.lizynz.folderx</string>
 	</dict>
@@ -78,59 +78,13 @@
 	</dict>
 	<dict>
 			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<false/>
-			<key>defaults</key>
-			<string>com.lizynz.folderx</string>
-			<key>key</key>
-			<string>fullfolder</string>
+			<string>PSLinkCell</string>
 			<key>label</key>
-			<string>Big Folder - iPhone</string>
-	</dict>
-	<dict>
-			<key>PostNotification</key>
-			<string>com.lizynz.folderx</string>
-			<key>cell</key>
-			<string>PSSliderCell</string>
-			<key>min</key>
-			<string>500</string>
-			<key>max</key>
-			<string>550</string>
-			<key>default</key>
-			<string>525</string>
-			<key>defaults</key>
-			<string>com.lizynz.folderx</string>
-			<key>key</key>
-			<string>FolderSize</string>
-			<key>showValue</key>
+			<string>Launcher</string>
+			<key>detail</key>
+			<string>LauncherListController</string>
+			<key>isController</key>
 			<true/>
-			<key>isSegmented</key>
-			<true/>
-			<key>segmentCount</key>
-			<integer>2</integer>
-	</dict>
-	<dict>
-			<key>cellClass</key>
-			<string>RadiusStepperCell</string>
-			<key>default</key>
-			<real>30</real>
-			<key>defaults</key>
-			<string>com.lizynz.folderx</string>
-			<key>key</key>
-			<string>FolderRadius</string>
-			<key>id</key>
-			<string>FolderRadius</string>
-			<key>label</key>
-			<string>Radius:</string>
-			<key>max</key>
-			<real>30</real>
-			<key>min</key>
-			<real>5</real>
-			<key>height</key>
-			<string>40</string>
-			<key>PostNotification</key>
-			<string>com.lizynz.folderx</string>
 	</dict>
         <dict>
 			<key>cell</key>
@@ -277,14 +231,26 @@
 			<string>Tap to Close Folder</string>
 	</dict>
 	<dict>
-			<key>cell</key>
-			<string>PSLinkCell</string>
+			<key>cellClass</key>
+			<string>RadiusStepperCell</string>
+			<key>default</key>
+			<real>35</real>
+			<key>defaults</key>
+			<string>com.lizynz.folderx</string>
+			<key>key</key>
+			<string>FolderRadius</string>
+			<key>id</key>
+			<string>FolderRadius</string>
 			<key>label</key>
-			<string>Launcher</string>
-			<key>detail</key>
-			<string>LauncherListController</string>
-			<key>isController</key>
-			<true/>
+			<string>Radius:</string>
+			<key>max</key>
+			<real>35</real>
+			<key>min</key>
+			<real>5</real>
+			<key>height</key>
+			<string>40</string>
+			<key>PostNotification</key>
+			<string>com.lizynz.folderx</string>
 	</dict>
 	<dict>
 			<key>cell</key>

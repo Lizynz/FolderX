@@ -383,22 +383,6 @@ static BOOL ios15 = YES;
     FXCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:self.cellReuseIdentifier forIndexPath:indexPath];
     
     SBIcon *icon = self.icons[indexPath.item];
-    
-//    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
-//    if ([[prefs objectForKey:@"HideLauncherLabel"] boolValue]) {
-//        cell.textLabel.text = @"";
-//    } else {
-//        if ([icon isBookmarkIcon]) {
-//            SBBookmarkIcon *bookmarkIcon = (SBBookmarkIcon *)icon;
-//            cell.textLabel.text = bookmarkIcon.displayName;
-//        } else if ([icon isApplicationIcon]) {
-//            SBApplicationIcon *applicationIcon = (SBApplicationIcon *)icon;
-//            cell.textLabel.text = applicationIcon.application.displayName;
-//        } else {
-//            cell.textLabel.text = @"";
-//        }
-//        cell.textLabel.backgroundColor = [UIColor clearColor];
-//    }
 
     if ([icon isKindOfClass:%c(SBIcon)]) {
         [cell setSBIcon:icon];
