@@ -76,13 +76,11 @@ static NSBundle *tweakBundle = nil;
 }
 
 - (void)twitter {
-    [[UIApplication sharedApplication]
-        openURL:[NSURL URLWithString:@"https://x.com/Lizynz1"]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://mobile.twitter.com/Lizynz1"] options:@{} completionHandler:nil];
 }
 
 - (void)github {
-    [[UIApplication sharedApplication]
-        openURL:[NSURL URLWithString:@"https://github.com/Lizynz/FolderX"]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://github.com/Lizynz/FolderX"] options:@{} completionHandler:nil];
 }
 @end
 
@@ -103,12 +101,8 @@ static NSBundle *tweakBundle = nil;
 
 - (void)refreshCellContentsWithSpecifier:(PSSpecifier *)specifier {
     [super refreshCellContentsWithSpecifier:specifier];
-
-    self.accessoryView = self.control;
-
     self.control.minimumValue = [specifier.properties[@"min"] doubleValue];
     self.control.maximumValue = [specifier.properties[@"max"] doubleValue];
-
     [self _updateLabel];
 }
 
@@ -119,10 +113,11 @@ static NSBundle *tweakBundle = nil;
 
 - (UIStepper *)newControl {
     UIStepper *stepper = [[UIStepper alloc] initWithFrame:CGRectZero];
-    
     stepper.continuous = NO;
+    
     stepper.minimumValue = 40;
     stepper.maximumValue = 60;
+    
     stepper.stepValue = 5;
     stepper.value = 40;
     
@@ -173,12 +168,8 @@ static NSBundle *tweakBundle = nil;
 
 - (void)refreshCellContentsWithSpecifier:(PSSpecifier *)specifier {
     [super refreshCellContentsWithSpecifier:specifier];
-
-    self.accessoryView = self.control;
-
     self.control.minimumValue = [specifier.properties[@"min"] doubleValue];
     self.control.maximumValue = [specifier.properties[@"max"] doubleValue];
-
     [self _updateLabel];
 }
 
@@ -189,13 +180,14 @@ static NSBundle *tweakBundle = nil;
 
 - (UIStepper *)newControl {
     UIStepper *stepper = [[UIStepper alloc] initWithFrame:CGRectZero];
-
     stepper.continuous = NO;
+    
     stepper.minimumValue = 5;
-    stepper.maximumValue = 35;
+    stepper.maximumValue = 30;
+    
     stepper.stepValue = 5;
-    stepper.value = 35;
-
+    stepper.value = 30;
+    
     return stepper;
 }
 
@@ -253,9 +245,16 @@ static NSBundle *tweakBundle = nil;
             [defaults removeObjectForKey:@"textColorDict"];
             [defaults removeObjectForKey:@"ficonColorDict"];
             [defaults removeObjectForKey:@"fbackgroundColorDict"];
+            
             [defaults synchronize];
 
-            [self reloadSpecifiers];
+            [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:domain];
+            
+            double delayInSeconds = 0.5;
+                dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+            dispatch_after(delayTime, dispatch_get_main_queue(), ^{
+                exit(0);
+            });
         }];
         
         cancelA.attributes = UIMenuElementAttributesDestructive;

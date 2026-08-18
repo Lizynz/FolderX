@@ -12,11 +12,6 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = FolderX
 
-FolderX_OBJCCFLAGS = \
-    -isystem /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/c++/v1 \
-    -Wno-cpp \
-    -Wno-vla-cxx-extension
-
 $(TWEAK_NAME)_FILES = $(wildcard *.xm *.m)
 $(TWEAK_NAME)_FRAMEWORKS = UIKit Foundation SpringBoardServices
 

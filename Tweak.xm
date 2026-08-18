@@ -4,8 +4,41 @@
 #define kScreenWidth          [[UIScreen mainScreen] bounds].size.width - 20
 
 int OLD = 1;
+static CGFloat folderSize;
 
 %hook SBFloatyFolderView
+- (CGRect)_frameForScalingView {
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
+            CGRect frame = %orig;
+            
+            return (CGRect){{10, frame.origin.y},{kScreenWidth, [self folderSize]}};
+        }
+    }
+    return %orig;
+}
+
+%new
+- (CGFloat)folderSize {
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    id FolderSize = [prefs objectForKey:@"FolderSize"];
+    if ([FolderSize intValue] >= 500 && [FolderSize intValue] <= 550) {
+        folderSize = [FolderSize floatValue];
+        return folderSize;
+    }
+    return 525;
+}
+
+- (BOOL)_shouldConvertToMultipleIconListsInLandscapeOrientation {
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
+            return NO;
+        }
+    }
+    return %orig;
+}
 
 - (double)_titleFontSize { //title size
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
@@ -17,15 +50,8 @@ int OLD = 1;
 }
 
 - (void)setCornerRadius:(double)arg1 {
-    if (@available(iOS 26, *)) {
-        SBHFloatyFolderVisualConfiguration *configuration =
-            [[%c(SBHFloatyFolderVisualConfiguration) alloc] init];
-
-        %orig(configuration.continuousCornerRadius);
-    } else {
-        arg1 = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
-        %orig(arg1);
-    }
+    arg1 = [%c(SBFolderBackgroundView) cornerRadiusToInsetContent];
+    %orig(arg1);
 }
 
 - (BOOL)_showsTitle {
@@ -36,6 +62,88 @@ int OLD = 1;
     return %orig;
 }
 
+%end
+
+%hook SBIconListFlowLayout
+- (NSUInteger)numberOfRowsForOrientation:(NSInteger)arg1 {
+    NSInteger x = %orig(arg1);
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
+            if (x==1) {
+                return %orig;
+            }
+            if (x==3) {
+                return 5;
+            }
+            return %orig;
+        }
+    }
+    return %orig;
+}
+
+- (NSUInteger)numberOfColumnsForOrientation:(NSInteger)arg1 {
+    NSInteger x = %orig(arg1);
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
+            if (x==1) {
+                return %orig;
+            }
+            if (x==3) {
+                return 4;
+            }
+            return %orig;
+        }
+    }
+    return %orig;
+}
+
+- (unsigned long long)maximumIconCount {
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
+            return 30;
+        }
+    }
+    return %orig;
+}
+%end
+
+%hook SBDockIconListView
+- (unsigned long long)maximumIconCount {
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
+            return 4;
+        }
+    }
+    return %orig;
+}
+%end
+
+%hook _SBIconGridWrapperView
+- (void)layoutSubviews {
+    %orig;
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
+            
+            self.translatesAutoresizingMaskIntoConstraints = YES;
+            self.transform = CGAffineTransformIdentity;
+            CGAffineTransform originalIconView = CGAffineTransformIdentity;
+            self.transform = CGAffineTransformMake(
+                                                   0.7,
+                                                   originalIconView.b,
+                                                   originalIconView.c,
+                                                   0.7,
+                                                   0.6,
+                                                   0.7
+                                                   );
+        }
+    }
+    return %orig;
+}
 %end
 
 #define HideFolderLabel(x) [x.location isEqualToString:@"SBIconLocationFolder"] //hide folder label
@@ -67,21 +175,31 @@ int OLD = 1;
 - (CGFloat)continuousCornerRadius { //folder radius #2
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
     id FolderRadius = [prefs objectForKey:@"FolderRadius"];
-    if( [FolderRadius intValue] >= 5 && [FolderRadius intValue] <= 35 ) {
+    if( [FolderRadius intValue] >= 5 && [FolderRadius intValue] <= 30 ) {
         return [FolderRadius floatValue];
     }
-    return 35;
+    return 30;
 }
 %end
 
 %hook SBFolderBackgroundView
+- (void)layoutSubviews { // Hide Background
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if ([[prefs objectForKey:@"bfh"] boolValue]) {
+        self.alpha = 0;
+        self.hidden = YES;
+        return ;
+    }
+    return %orig;
+}
+
 + (double)cornerRadiusToInsetContent { //folder radius #3
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
     id FolderRadius = [prefs objectForKey:@"FolderRadius"];
-    if( [FolderRadius intValue] >= 5 && [FolderRadius intValue] <= 35 ) {
+    if( [FolderRadius intValue] >= 5 && [FolderRadius intValue] <= 30 ) {
         return [FolderRadius floatValue];
     }
-    return 35;
+    return 30;
 }
 %end
 
@@ -175,6 +293,26 @@ int OLD = 1;
 int TITLE = 2;
 
 %hook SBFolderTitleTextField
+- (CGRect)clearButtonRectForBounds:(CGRect)frame {
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if (prefs) {
+        TITLE = [prefs objectForKey:@"title"] ? [[prefs objectForKey:@"title"] intValue] : TITLE;
+    }
+    if (TITLE == 1) {
+    }
+    if (TITLE == 2) {
+    }
+    if (TITLE == 3) {
+        if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone){
+                UIEdgeInsets insets = UIEdgeInsetsMake(0, -285, 0, 0);
+                CGRect insetRect = UIEdgeInsetsInsetRect(frame, insets);
+                return insetRect;
+            }
+        }
+    }
+    return %orig;
+}
 
 - (CGRect)textRectForBounds:(CGRect)frame {
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
@@ -188,7 +326,8 @@ int TITLE = 2;
         return insetRect;
     }
 
-    if (TITLE == 2) {}
+    if (TITLE == 2) {
+    }
 
     if (TITLE == 3) {
         UIEdgeInsets insets = UIEdgeInsetsMake(0, 0, 0, 20);
@@ -209,7 +348,8 @@ int TITLE = 2;
         return insetRect;
     }
     
-    if (TITLE == 2) {}
+    if (TITLE == 2) {
+    }
     
     if (TITLE == 3) {
         UIEdgeInsets insets = UIEdgeInsetsMake(0, 0, 0, 20);
@@ -231,7 +371,6 @@ int TITLE = 2;
     }
 
     if (TITLE == 2) {
-        [self setTextAlignment:NSTextAlignmentCenter];
     }
 
     if (TITLE == 3) {
@@ -243,4 +382,34 @@ int TITLE = 2;
     }
 }
 
+%end
+
+%hook SBHLibraryAdditionalItemsIndicatorIconImageView
+- (void)layoutSubviews {
+    %orig;
+    
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    if ([[prefs objectForKey:@"fullfolder"] boolValue]) {
+        
+//        NSLog(@"Before reset: %@", NSStringFromCGAffineTransform(self.transform));
+
+        self.translatesAutoresizingMaskIntoConstraints = YES;
+        self.transform = CGAffineTransformIdentity;
+
+//        NSLog(@"After reset: %@", NSStringFromCGAffineTransform(self.transform));
+
+        CGAffineTransform originalIconView = self.transform;
+        self.transform = CGAffineTransformMake(
+                                                1.45,
+                                                originalIconView.b,
+                                                originalIconView.c,
+                                                1.45,
+                                                originalIconView.tx - 0.5,
+                                                originalIconView.ty - 0.5
+                                                );
+
+//        NSLog(@"After new transform: %@", NSStringFromCGAffineTransform(self.transform));
+    }
+    return %orig;
+}
 %end

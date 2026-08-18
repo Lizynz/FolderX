@@ -24,14 +24,7 @@
 
 - (void)refreshCellContentsWithSpecifier:(PSSpecifier *)specifier {
     [super refreshCellContentsWithSpecifier:specifier];
-
-    self.accessoryView = self.control;
-
-    self.control.backgroundColor =
-        [self cellEnabled] ? [self selectedColor] : [UIColor secondaryLabelColor];
-
-    self.control.layer.cornerRadius =
-        self.control.bounds.size.width / 2.0;
+    self.control.backgroundColor = [self cellEnabled] ? [self selectedColor] : [UIColor secondaryLabelColor];
 }
 
 - (UIButton *)newControl {

@@ -3,12 +3,8 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <spawn.h>
-#include <roothide.h>
 
 #define kRWSettingsPath @"/var/jb/var/mobile/Library/Preferences/com.lizynz.folderx.plist"
-
-#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
-#define SYSTEM_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 
 @interface NSUserDefaults (FolderX)
 - (id)objectForKey:(NSString *)key inDomain:(NSString *)domain;
@@ -29,13 +25,8 @@
 @property (nonatomic, retain) UIView *backgroundView;
 @end
 
-@interface SBFolderController : UIViewController
-- (BOOL)isOpen;
-@end
-
 @interface SBHIconManager : NSObject
 - (void)closeFolderAnimated:(BOOL)arg1 withCompletion:(id)arg2;
-- (SBFolderController *)openedFolderController;
 @end
 
 @interface SBIconListView : UIView
@@ -46,6 +37,10 @@
 @property(copy, nonatomic) NSString *displayName;
 - (NSArray *)icons;
 - (id)allIcons;
+@end
+
+@interface SBFolderController : UIViewController
+- (BOOL)isOpen;
 @end
 
 @interface SBIconController : UIViewController
@@ -85,12 +80,4 @@
 @interface SBHLibraryAdditionalItemsIndicatorIconImageView : SBFolderIconImageView
 @property (nonatomic, assign) CGAffineTransform transform;
 - (unsigned long long)concreteBackgroundStyle;
-@end
-
-@interface SBHFloatyFolderVisualConfiguration : NSObject
-@property (nonatomic) double continuousCornerRadius;
-@end
-
-@interface SBMutableIconLabelImageParameters : NSObject
-@property (nonatomic, strong) UIColor *textColor;
 @end
