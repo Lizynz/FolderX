@@ -178,6 +178,7 @@ int TITLE = 2;
 
 - (CGRect)textRectForBounds:(CGRect)frame {
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    
     if (prefs) {
         TITLE = [prefs objectForKey:@"title"] ? [[prefs objectForKey:@"title"] intValue] : TITLE;
     }
@@ -188,40 +189,37 @@ int TITLE = 2;
         return insetRect;
     }
 
-    if (TITLE == 2) {}
-
-    if (TITLE == 3) {
-        UIEdgeInsets insets = UIEdgeInsetsMake(0, 0, 0, 20);
-        CGRect insetRect = UIEdgeInsetsInsetRect(frame, insets);
-        return insetRect;
+    if (TITLE == 2) {
+        
     }
+
     return %orig;
 }
 
 - (CGRect)editingRectForBounds:(CGRect)frame {
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    
     if (prefs) {
         TITLE = [prefs objectForKey:@"title"] ? [[prefs objectForKey:@"title"] intValue] : TITLE;
     }
+    
     if (TITLE == 1) {
         UIEdgeInsets insets = UIEdgeInsetsMake(0, 20, 0, 0);
         CGRect insetRect = UIEdgeInsetsInsetRect(frame, insets);
         return insetRect;
     }
     
-    if (TITLE == 2) {}
-    
-    if (TITLE == 3) {
-        UIEdgeInsets insets = UIEdgeInsetsMake(0, 0, 0, 20);
-        CGRect insetRect = UIEdgeInsetsInsetRect(frame, insets);
-        return insetRect;
+    if (TITLE == 2) {
+        
     }
+    
     return %orig;
 }
 
 - (void)layoutSubviews {
     %orig;
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:kRWSettingsPath];
+    
     if (prefs) {
         TITLE = [prefs objectForKey:@"title"] ? [[prefs objectForKey:@"title"] intValue] : TITLE;
     }
@@ -232,10 +230,6 @@ int TITLE = 2;
 
     if (TITLE == 2) {
         [self setTextAlignment:NSTextAlignmentCenter];
-    }
-
-    if (TITLE == 3) {
-        [self setTextAlignment:NSTextAlignmentRight];
     }
 
     if ([[prefs objectForKey:@"BoldTitle"] boolValue]) {

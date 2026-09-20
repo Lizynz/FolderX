@@ -47,6 +47,15 @@ static SBIconController *iconController = nil;
     }
     return %orig;
 }
+
+//- (_Bool)_tapToCloseGestureRecognizer:(UITapGestureRecognizer *)arg1 shouldReceiveTouch:(UITouch *)arg2 {
+//    return YES;
+//}
+//
+//- (_Bool)gestureRecognizer:(UIGestureRecognizer *)arg1 shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)arg2 {
+//    return YES;
+//}
+
 %end
 
 //add drag
