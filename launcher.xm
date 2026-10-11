@@ -379,16 +379,17 @@ static BOOL ios15 = YES;
 }
 
 %new
+
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     FXCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:self.cellReuseIdentifier forIndexPath:indexPath];
-    
+
     SBIcon *icon = self.icons[indexPath.item];
 
     if ([icon isKindOfClass:%c(SBIcon)]) {
         [cell setSBIcon:icon];
-        
+
         SBIconView *realIconView = [self.customListView displayedIconViewForIcon:icon];
-        
+
         if (realIconView) {
             cell.iconView.overrideActionDelegate = [realIconView actionDelegate];
         }
@@ -399,38 +400,7 @@ static BOOL ios15 = YES;
     newView.layer.cornerRadius = 16.0;
     cell.selectedBackgroundView = newView;
     cell.layer.cornerRadius = 16.0;
-    
-    if ([icon isApplicationIcon]) {
-        SBApplicationIcon *applicationIcon = (SBApplicationIcon *)icon;
 
-        SBApplication *application = applicationIcon.application;
-        if (application.badgeValue != nil) {
-            if (!cell.badgeView) {
-                cell.badgeView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 17, 17)];
-                cell.badgeView.layer.cornerRadius = cell.badgeView.frame.size.width / 2.0;
-                cell.badgeView.backgroundColor = [UIColor redColor];
-                [collectionView addSubview:cell.badgeView];
-            }
-            
-            cell.badgeTextLabel.text = [application.badgeValue stringValue];
-            [cell.badgeTextLabel sizeToFit];
-            
-            UICollectionViewLayout *layout = collectionView.collectionViewLayout;
-            UICollectionViewLayoutAttributes *attributes = [layout layoutAttributesForItemAtIndexPath:indexPath];
-            
-            CGRect cellRect = attributes.frame;
-            CGRect badgeRect = cell.badgeView.frame;
-            badgeRect.origin = [collectionView convertPoint:cellRect.origin fromView:collectionView.superview];
-            badgeRect.origin.x = CGRectGetMaxX(cellRect) - badgeRect.size.width - 4;
-            badgeRect.origin.y = cellRect.origin.y + (cellRect.size.height - badgeRect.size.height) / 6 - badgeRect.size.height / 2;
-            cell.badgeView.frame = badgeRect;
-            cell.badgeView.hidden = NO;
-        } else {
-            cell.badgeView.hidden = YES;
-        }
-    } else {
-        cell.badgeView.hidden = YES;
-    }
     return cell;
 }
 
