@@ -95,10 +95,17 @@
 - (void)deselectAllItems;
 @end
 
-#define kRWSettingsPath @"/var/jb/var/mobile/Library/Preferences/com.lizynz.folderx.plist"
+#define kRWSettingsPath jbroot(@"/var/mobile/Library/Preferences/com.lizynz.folderx.plist")
 
-static const NSBundle *tweakBundle = [NSBundle bundleWithPath:@"/var/jb/Library/PreferenceBundles/FolderX.bundle"];
-#define LOCALIZED(str) [tweakBundle localizedStringForKey:str value:@"" table:nil]
+static NSBundle *FolderXBundle(void) {
+    static NSBundle *bundle = nil;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        bundle = [NSBundle bundleWithPath:jbroot(@"/Library/PreferenceBundles/FolderX.bundle")];
+    });
+    return bundle;
+}
+#define LOCALIZED(str) [FolderXBundle() localizedStringForKey:str value:@"" table:nil]
 
 #define kScreenHeight         [[UIScreen mainScreen] bounds].size.height
 #define kScreenWidth          [[UIScreen mainScreen] bounds].size.width

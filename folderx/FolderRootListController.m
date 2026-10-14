@@ -1,20 +1,37 @@
 #import <Foundation/Foundation.h>
 #import "FolderRootListController.h"
 #import <spawn.h>
-
-static NSString *saveSettings = @"/var/jb/var/mobile/Library/Preferences/com.lizynz.folderx.plist";
+#import <sys/wait.h>
+#include <roothide.h>
 
 static NSBundle *tweakBundle = nil;
 #define LOCALIZED(str) [tweakBundle localizedStringForKey:str value:@"" table:nil]
 
-@implementation FolderRootListController{
+static NSString *JBPath(const char *path) {
+    return [NSString stringWithUTF8String:jbroot(path)];
+}
+
+static NSString *saveSettings(void) {
+    return JBPath("/var/mobile/Library/Preferences/com.lizynz.folderx.plist");
+}
+
+static void respring(void) {
+    pid_t pid;
+    int status;
+    const char *args[] = { "killall", "-9", "SpringBoard", NULL };
+    if (posix_spawn(&pid, jbroot("/usr/bin/killall"), NULL, NULL, (char *const *)args, NULL) == 0) {
+        waitpid(pid, &status, 0);
+    }
+}
+
+@implementation FolderRootListController {
     BOOL _settingsChanged;
 }
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        tweakBundle = [NSBundle bundleWithPath:@"/var/jb/Library/PreferenceBundles/FolderX.bundle"];
+        tweakBundle = [NSBundle bundleForClass:self.class];
     }
     return self;
 }
@@ -23,47 +40,31 @@ static NSBundle *tweakBundle = nil;
     if (!_specifiers) {
         _specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
         
-        UIAction *titleA = [UIAction actionWithTitle:LOCALIZED(@"Respring") image:[UIImage systemImageNamed:@"rays"] identifier:nil handler:^(__kindof UIAction *_Nonnull action) {
-            
-            pid_t pid;
-            int status;
-            const char* args[] = { "killall", "-9", "SpringBoard", NULL };
-            posix_spawn(&pid, "/var/jb/usr/bin/killall", NULL, NULL, (char* const*)args, NULL);
-            waitpid(pid, &status, WEXITED);
-        
-        }];
-
-        UIAction *cancelA = [UIAction actionWithTitle:LOCALIZED(@"Reset settings") image:[UIImage systemImageNamed:@"trash"] identifier:nil handler:^(__kindof UIAction *_Nonnull action) {
-            NSString *path1 = @"/var/jb/var/mobile/Library/Preferences/com.lizynz.folderx.plist";
-            NSString *path2 = @"/var/mobile/Library/Preferences/com.lizynz.folderx.plist";
-
-            NSString *domain = @"com.lizynz.folderx";
-            NSError *error;
-
-            NSFileManager *fileManager = [NSFileManager defaultManager];
-            if ([fileManager fileExistsAtPath:path1]) {
-                [fileManager removeItemAtPath:path1 error:&error];
-            }
-
-            if ([fileManager fileExistsAtPath:path2]) {
-                [fileManager removeItemAtPath:path2 error:&error];
-            }
-            
-            pid_t pid;
-            int status;
-            const char* args[] = { "killall", "-9", "SpringBoard", NULL };
-            posix_spawn(&pid, "/var/jb/usr/bin/killall", NULL, NULL, (char* const*)args, NULL);
-            waitpid(pid, &status, WEXITED);
-
-            [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:domain];
+        UIAction *titleA = [UIAction actionWithTitle:LOCALIZED(@"Respring")
+                                               image:[UIImage systemImageNamed:@"rays"]
+                                          identifier:nil
+                                             handler:^(__kindof UIAction *action) {
+            respring();
         }];
         
+        UIAction *cancelA = [UIAction actionWithTitle:LOCALIZED(@"Reset settings")
+                                                image:[UIImage systemImageNamed:@"trash"]
+                                           identifier:nil
+                                              handler:^(__kindof UIAction *action) {
+            NSFileManager *fm = [NSFileManager defaultManager];
+            NSString *path = saveSettings();
+            if ([fm fileExistsAtPath:path]) {
+                [fm removeItemAtPath:path error:nil];
+            }
+            
+            [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:@"com.lizynz.folderx"];
+            respring();
+        }];
         cancelA.attributes = UIMenuElementAttributesDestructive;
-
-        UIMenu *menuActions = [UIMenu menuWithTitle:@"" children:@[titleA, cancelA]];
-        UIBarButtonItem *optionsItem = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"hand.tap"] menu:menuActions];
+        
+        UIMenu *menu = [UIMenu menuWithTitle:@"" children:@[titleA, cancelA]];
+        UIBarButtonItem *optionsItem = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"hand.tap"] menu:menu];
         optionsItem.tintColor = [UIColor systemBlueColor];
-
         self.navigationItem.rightBarButtonItems = @[optionsItem];
     }
     return _specifiers;
@@ -78,6 +79,7 @@ static NSBundle *tweakBundle = nil;
     [[UIApplication sharedApplication]
         openURL:[NSURL URLWithString:@"https://github.com/Lizynz/FolderX"]];
 }
+
 @end
 
 @interface TitleStepperCell : PSControlTableCell
@@ -227,27 +229,26 @@ static NSBundle *tweakBundle = nil;
 - (NSArray *)specifiers {
     if (!_specifiers) {
         _specifiers = [self loadSpecifiersFromPlistName:@"Color" target:self];
-        
-        UIAction *titleA = [UIAction actionWithTitle:LOCALIZED(@"Respring") image:[UIImage systemImageNamed:@"rays"] identifier:nil handler:^(__kindof UIAction *_Nonnull action) {
-            
-            pid_t pid;
-            int status;
-            const char* args[] = { "killall", "-9", "SpringBoard", NULL };
-            posix_spawn(&pid, "/var/jb/usr/bin/killall", NULL, NULL, (char* const*)args, NULL);
-            waitpid(pid, &status, WEXITED);
-            
+
+        UIAction *titleA = [UIAction actionWithTitle:LOCALIZED(@"Respring")
+                                               image:[UIImage systemImageNamed:@"rays"]
+                                          identifier:nil
+                                             handler:^(__kindof UIAction *_Nonnull action) {
+            respring();
         }];
 
-        UIAction *cancelA = [UIAction actionWithTitle:LOCALIZED(@"Reset color") image:[UIImage systemImageNamed:@"trash"] identifier:nil handler:^(__kindof UIAction *_Nonnull action) {
-            
-            NSString *domain = saveSettings;
-            NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:domain];
-            
-            [defaults removeObjectForKey:@"nameColorDict"];
-            [defaults removeObjectForKey:@"textColorDict"];
-            [defaults removeObjectForKey:@"ficonColorDict"];
-            [defaults removeObjectForKey:@"fbackgroundColorDict"];
-            [defaults synchronize];
+        UIAction *cancelA = [UIAction actionWithTitle:LOCALIZED(@"Reset color")
+                                                image:[UIImage systemImageNamed:@"trash"]
+                                           identifier:nil
+                                              handler:^(__kindof UIAction *_Nonnull action) {
+            CFStringRef domain = CFSTR("com.lizynz.folderx");
+            NSArray *keys = @[@"nameColorDict", @"textColorDict", @"ficonColorDict", @"fbackgroundColorDict"];
+
+            for (NSString *key in keys) {
+                CFPreferencesSetValue((__bridge CFStringRef)key, NULL, domain,
+                                      kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+            }
+            CFPreferencesSynchronize(domain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 
             [self reloadSpecifiers];
         }];
