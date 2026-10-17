@@ -4,6 +4,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <CoreData/CoreData.h>
+//#import <objc/message.h>
 #include <roothide.h>
 
 @interface SBIcon : NSObject
@@ -105,6 +106,31 @@ static NSBundle *FolderXBundle(void) {
     });
     return bundle;
 }
+
+//static id FXIconManager(void) {
+//    Class icClass = NSClassFromString(@"SBIconController");
+//    SEL sharedSel = NSSelectorFromString(@"sharedInstance");
+//    if (!icClass || ![icClass respondsToSelector:sharedSel]) {
+//        return nil;
+//    }
+//
+//    id ic = ((id (*)(id, SEL))objc_msgSend)(icClass, sharedSel);
+//
+//    SEL managerSel = NSSelectorFromString(@"iconManager");
+//    if (!ic || ![ic respondsToSelector:managerSel]) {
+//        return nil;
+//    }
+//
+//    return ((id (*)(id, SEL))objc_msgSend)(ic, managerSel);
+//}
+//
+//static void FXAttachIconDelegate(SBIconView *iconView) {
+//    id manager = FXIconManager();
+//    if (manager && [iconView respondsToSelector:@selector(setDelegate:)]) {
+//        iconView.delegate = manager;
+//    }
+//}
+
 #define LOCALIZED(str) [FolderXBundle() localizedStringForKey:str value:@"" table:nil]
 
 #define kScreenHeight         [[UIScreen mainScreen] bounds].size.height
@@ -401,6 +427,11 @@ static BOOL ios15 = YES;
             cell.iconView.overrideActionDelegate = [realIconView actionDelegate];
         }
     }
+    
+//    if ([icon isKindOfClass:%c(SBIcon)]) {
+//        [cell setSBIcon:icon];
+//        FXAttachIconDelegate(cell.iconView);
+//    }
 
     UIView *newView = [[UIView alloc] initWithFrame:cell.bounds];
     newView.backgroundColor = [UIColor clearColor];
